@@ -11,15 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "match_pairs")
-public class MatchPair {
+@Table(name = "roles")
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(nullable = false)
-    private String sourceItem;
-
-    @Column(nullable = false)
-    private String targetItem;
+    @Column(nullable = false, unique = true)
+    private String name;
 }

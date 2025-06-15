@@ -11,8 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "match_pairs")
-public class MatchPair {
+@Table(name = "submitted_pairs")
+public class SubmittedPair {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
