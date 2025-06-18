@@ -30,7 +30,7 @@ public class QuizAttempt {
     @Column(nullable = false)
     private LocalDateTime startedAt;
 
-    private LocalDateTime submittedAt;
+    private LocalDateTime finishedAt;
 
     private Double score;
 
