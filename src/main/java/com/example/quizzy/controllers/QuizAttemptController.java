@@ -2,6 +2,7 @@ package com.example.quizzy.controllers;
 
 import com.example.quizzy.dto.QuizAttemptStartResponseDto;
 import com.example.quizzy.dto.QuizSubmissionDto;
+import com.example.quizzy.dto.QuizResultDto;
 import com.example.quizzy.services.QuizAttemptService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,15 +30,15 @@ public class QuizAttemptController {
     }
 
     /**
-     * Submits answers for a specific quiz attempt.
+     * Submits answers for a specific quiz attempt, gets the result, and returns it.
      * @param attemptId The ID of the quiz attempt being submitted.
      * @param submissionDto The DTO containing the list of answers.
-     * @return A no content response indicating success.
+     * @return A DTO containing the detailed results of the quiz.
      */
     @PostMapping("/{attemptId}/submit")
     @PreAuthorize("@quizAttemptSecurityService.isOwner(#attemptId, authentication)")
-    public ResponseEntity<Void> submitAnswers(@PathVariable Long attemptId, @Valid @RequestBody QuizSubmissionDto submissionDto) {
-        quizAttemptService.submitAnswers(attemptId, submissionDto);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<QuizResultDto> submitAnswers(@PathVariable Long attemptId, @Valid @RequestBody QuizSubmissionDto submissionDto) {
+        QuizResultDto result = quizAttemptService.submitAnswers(attemptId, submissionDto);
+        return ResponseEntity.ok(result);
     }
 }
