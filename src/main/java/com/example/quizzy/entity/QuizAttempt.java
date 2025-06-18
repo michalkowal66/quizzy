@@ -28,6 +28,8 @@ public class QuizAttempt {
     private Quiz quiz;
 
     @Column(nullable = false)
+    private LocalDateTime startedAt;
+
     private LocalDateTime submittedAt;
 
     private Double score;
