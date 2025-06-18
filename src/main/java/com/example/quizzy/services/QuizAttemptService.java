@@ -1,6 +1,7 @@
 package com.example.quizzy.services;
 
 import com.example.quizzy.dto.QuizAttemptStartResponseDto;
+import com.example.quizzy.dto.QuizResultDto;
 import com.example.quizzy.dto.QuizSubmissionDto;
 
 public interface QuizAttemptService {
@@ -13,9 +14,10 @@ public interface QuizAttemptService {
     QuizAttemptStartResponseDto startQuiz(Long quizId);
 
     /**
-     * Submits answers for a given quiz attempt.
+     * Submits answers for a given quiz attempt, grades them, and returns the result.
      * @param attemptId The ID of the quiz attempt.
      * @param submissionDto The DTO containing the user's answers.
+     * @return A DTO with the detailed quiz result.
      */
-    void submitAnswers(Long attemptId, QuizSubmissionDto submissionDto);
+    QuizResultDto submitAnswers(Long attemptId, QuizSubmissionDto submissionDto);
 }
