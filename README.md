@@ -108,7 +108,7 @@ Swagger UI is available at:
 
 `http://localhost:8080/swagger-ui/index.html`
 
-![swagger.png](img/swagger.png)
+![swagger.png](img/swagger-ui.png)
 
 ## ER Diagram
 
