@@ -10,7 +10,6 @@ import java.util.List;
 @Entity
 @Table(name = "multiple_choice_questions")
 public class MultipleChoiceQuestion extends Question {
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "question_id")
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Choice> choices;
 }

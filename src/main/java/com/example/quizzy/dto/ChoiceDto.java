@@ -9,5 +9,5 @@ import lombok.Setter;
 public class ChoiceDto {
     @NotBlank
     private String text;
-    private boolean isCorrect;
+    private boolean correct;
 }

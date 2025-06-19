@@ -58,6 +58,7 @@ public class QuestionServiceImpl implements QuestionService {
                 Choice choice = new Choice();
                 choice.setText(choiceDto.getText());
                 choice.setCorrect(choiceDto.isCorrect());
+                choice.setQuestion(mcQuestion); // Set the other side of the relationship
                 mcQuestion.getChoices().add(choice);
             });
         } else if (question instanceof MatchingQuestion mQuestion && dto instanceof MatchingQuestionRequestDto mDto) {
@@ -107,12 +108,14 @@ public class QuestionServiceImpl implements QuestionService {
         // Jackson's polymorphic deserialization
         if (dto instanceof MultipleChoiceQuestionRequestDto mcDto) {
             MultipleChoiceQuestion mcQuestion = new MultipleChoiceQuestion();
-            mcQuestion.setChoices(mcDto.getChoices().stream().map(choiceDto -> {
+            List<Choice> choices = mcDto.getChoices().stream().map(choiceDto -> {
                 Choice choice = new Choice();
                 choice.setText(choiceDto.getText());
                 choice.setCorrect(choiceDto.isCorrect());
+                choice.setQuestion(mcQuestion); // Set the other side of the relationship
                 return choice;
-            }).collect(Collectors.toList()));
+            }).collect(Collectors.toList());
+            mcQuestion.setChoices(choices);
             question = mcQuestion;
         } else if (dto instanceof TrueFalseQuestionRequestDto tfDto) {
             TrueFalseQuestion tfQuestion = new TrueFalseQuestion();
@@ -120,12 +123,13 @@ public class QuestionServiceImpl implements QuestionService {
             question = tfQuestion;
         } else if (dto instanceof MatchingQuestionRequestDto mDto) {
             MatchingQuestion mQuestion = new MatchingQuestion();
-            mQuestion.setPairs(mDto.getPairs().stream().map(pairDto -> {
+            List<MatchPair> pairs = mDto.getPairs().stream().map(pairDto -> {
                 MatchPair pair = new MatchPair();
                 pair.setSourceItem(pairDto.getSourceItem());
                 pair.setTargetItem(pairDto.getTargetItem());
                 return pair;
-            }).collect(Collectors.toList()));
+            }).collect(Collectors.toList());
+            mQuestion.setPairs(pairs);
             question = mQuestion;
         } else {
             throw new IllegalArgumentException("Unknown question type");
