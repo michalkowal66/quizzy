@@ -88,9 +88,18 @@ class QuizAttemptServiceImplTest {
         MultipleChoiceQuestion question = new MultipleChoiceQuestion();
         question.setId(20L);
         question.setText("Which are JVM languages?");
-        Choice choice1 = new Choice(1L, "Java", true);
-        Choice choice2 = new Choice(2L, "Kotlin", true);
-        Choice choice3 = new Choice(3L, "TypeScript", false);
+        Choice choice1 = new Choice();
+        choice1.setId(1L);
+        choice1.setText("Java");
+        choice1.setCorrect(true);
+        Choice choice2 = new Choice();
+        choice2.setId(2L);
+        choice2.setText("Kotlin");
+        choice2.setCorrect(true);
+        Choice choice3 = new Choice();
+        choice3.setId(3L);
+        choice3.setText("TypeScript");
+        choice3.setCorrect(false);
         question.setChoices(Arrays.asList(choice1, choice2, choice3));
         return question;
     }
