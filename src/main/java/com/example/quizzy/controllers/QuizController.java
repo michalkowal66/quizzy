@@ -65,6 +65,17 @@ public class QuizController {
     }
 
     /**
+     * Retrieves all quizzes.
+     * This endpoint is public and does not require authentication.
+     *
+     * @return The quizzes data.
+     */
+    @GetMapping("/")
+    public ResponseEntity<List<QuizResponseDto>> getAllQuizzes() {
+        return ResponseEntity.ok(quizService.getAllQuizzes());
+    }
+
+    /**
      * Updates an existing quiz.
      * Access is restricted to the owner of the quiz or an admin.
      *
@@ -173,4 +184,6 @@ public class QuizController {
         QuestionResponseDto question = questionService.getQuestionById(questionId);
         return ResponseEntity.ok(question);
     }
+
+
 }
