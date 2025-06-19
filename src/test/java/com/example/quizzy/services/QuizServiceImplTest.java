@@ -203,4 +203,49 @@ class QuizServiceImplTest {
         assertThrows(RuntimeException.class, () -> quizService.deleteQuiz(99L));
         verify(quizRepository, never()).deleteById(anyLong());
     }
+
+    @Test
+    @DisplayName("getAllQuizzes should return a list of all quiz DTOs")
+    void getAllQuizzes_shouldReturnAllQuizDtos() {
+        // Arrange
+        Quiz quiz2 = new Quiz();
+        quiz2.setId(20L);
+        quiz2.setTitle("Another Quiz");
+        quiz2.setAuthor(testUser);
+
+        List<Quiz> quizList = List.of(testQuiz, quiz2);
+        when(quizRepository.findAll()).thenReturn(quizList);
+
+        // Act
+        List<QuizResponseDto> result = quizService.getAllQuizzes();
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("Initial Title", result.get(0).getTitle());
+        assertEquals("Another Quiz", result.get(1).getTitle());
+
+        // Verify
+        verify(quizRepository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("updateQuiz should throw exception when quiz does not exist")
+    void updateQuiz_whenQuizNotFound_shouldThrowException() {
+        // Arrange
+        long nonExistentQuizId = 99L;
+        QuizDto updateDto = new QuizDto();
+        updateDto.setTitle("Non Existent");
+
+        when(quizRepository.findById(nonExistentQuizId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> {
+            quizService.updateQuiz(nonExistentQuizId, updateDto);
+        });
+
+        // Verify
+        verify(quizRepository, times(1)).findById(nonExistentQuizId);
+        verify(quizRepository, never()).save(any(Quiz.class));
+    }
 }
