@@ -47,7 +47,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // public endpoints
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // swagger
-                        .requestMatchers(HttpMethod.GET, "/api/quizzes/{id}").permitAll() // public endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/quizzes/{id}").permitAll() // public endpoint
+                        .requestMatchers(HttpMethod.GET, "/api/quizzes/").permitAll() // public endpoint
                         .anyRequest().authenticated() // other requests require authentication
                 );
 
