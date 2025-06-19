@@ -43,6 +43,9 @@ Before running the project, make sure you have met the following requirements:
 The app requires the following environmental variables to be set in a .env file within the main directory:
 
 ```env
+ADMIN_USER=quizzy_admin
+ADMIN_MAIL=quizzy_admin@quizzy.com
+ADMIN_PASSWORD=quizzy_admin_password
 POSTGRES_DB=db_name
 POSTGRES_USER=db_user
 POSTGRES_PASSWORD=db_password
