@@ -8,6 +8,7 @@ public interface QuizService {
     QuizResponseDto createQuiz(QuizDto quizDto);
     QuizResponseDto getQuizById(Long quizId);
     List<QuizResponseDto> getCurrentUserQuizzes();
+    List<QuizResponseDto> getAllQuizzes();
     QuizResponseDto updateQuiz(Long quizId, QuizDto quizDto);
     void deleteQuiz(Long quizId);
 }

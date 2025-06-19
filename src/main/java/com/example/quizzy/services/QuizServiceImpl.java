@@ -54,6 +54,14 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<QuizResponseDto> getAllQuizzes() {
+        return quizRepository.findAll().stream()
+                .map(this::mapToQuizResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public QuizResponseDto updateQuiz(Long quizId, QuizDto quizDto) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz not found with id: " + quizId));
