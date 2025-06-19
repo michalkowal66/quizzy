@@ -164,6 +164,31 @@ class QuizControllerTest {
 
             verify(quizService).deleteQuiz(quizId);
         }
+
+        @Test
+        @DisplayName("GET /api/quizzes/ should return all quizzes")
+        void getAllQuizzes_whenPublic_shouldReturnAllQuizzes() throws Exception {
+            // Arrange
+            QuizResponseDto quiz1 = new QuizResponseDto();
+            quiz1.setId(1L);
+            quiz1.setTitle("First Global Quiz");
+
+            QuizResponseDto quiz2 = new QuizResponseDto();
+            quiz2.setId(2L);
+            quiz2.setTitle("Second Global Quiz");
+
+            when(quizService.getAllQuizzes()).thenReturn(List.of(quiz1, quiz2));
+
+            // Act & Assert
+            mockMvc.perform(get("/api/quizzes/"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(2)))
+                    .andExpect(jsonPath("$[0].title", is(quiz1.getTitle())))
+                    .andExpect(jsonPath("$[1].title", is(quiz2.getTitle())));
+
+            // Verify
+            verify(quizService).getAllQuizzes();
+        }
     }
 
     @Nested
