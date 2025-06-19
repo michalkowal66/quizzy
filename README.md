@@ -40,7 +40,7 @@ Before running the project, make sure you have met the following requirements:
 
 ### 0\. Before building the app
 
-The app requires the following environmental variables to be set in a .env file within the main directory:
+The app requires the following environmental variables to be set in a .env file within the root directory of the repository:
 
 ```env
 ADMIN_USER=quizzy_admin
