@@ -1,0 +1,177 @@
+﻿@page "/quizattempt/{QuizId:int}"
+@using Radzen
+@using Radzen.Blazor
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    Quiz name
+</RadzenText>
+
+@if (questions == null)
+{
+    <RadzenProgressBar Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+}
+else
+{
+    <RadzenRow class="rz-text-align-center mb-4" Gap="1rem">
+        @for (int i = 0; i < questions.Count; i++)
+        {
+            var questionIndex = i;
+            var variant = questions[i].SelectedAnswerId == null ? Variant.Outlined : Variant.Filled;
+
+            <RadzenColumn Size="3">
+                <RadzenButton Text="@((questionIndex + 1).ToString())"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Variant=@variant
+                              Shade="Shade.Lighter"
+                              Class="rz-w-100"
+                              Disabled=@(questionIndex==currentQuestionIndex)
+                              Click="@(() => GoToQuestion(questionIndex))" />
+            </RadzenColumn>
+        }
+    </RadzenRow>
+
+    <RadzenCard>
+        @if (currentQuestionIndex == null)
+        {
+            <RadzenText TextStyle="TextStyle.H5">Loading questions...</RadzenText>
+        }
+        else
+        {
+            var currentQuestion = questions[currentQuestionIndex.Value];
+
+            <RadzenText TextStyle="TextStyle.H5">Question @(currentQuestionIndex + 1)</RadzenText>
+
+            <RadzenText class="mb-3"
+                        TextStyle="TextStyle.Body1">
+                @currentQuestion.Content
+            </RadzenText>
+
+            <RadzenRadioButtonList Value=@currentQuestion.SelectedAnswerId
+                                   Orientation="Orientation.Vertical"
+                                   TValue="int?"
+                                   Change=@(args => currentQuestion.SelectedAnswerId = args)>
+                <Items>
+                    @foreach (var answer in currentQuestion.Answers)
+                    {
+                        <RadzenRadioButtonListItem Text="@answer.Content"
+                                                   Value="@((int?)answer.Id)"
+                                                   TValue="int?" />
+                    }
+                </Items>
+            </RadzenRadioButtonList>
+        }
+    </RadzenCard>
+
+    <RadzenStack Orientation="Orientation.Horizontal"
+                 JustifyContent="JustifyContent.SpaceBetween"
+                 AlignItems="AlignItems.Center"
+                 Class="rz-mt-4">
+
+        <RadzenButton ButtonStyle="ButtonStyle.Primary"
+                      Variant="Variant.Outlined"
+                      Disabled="@(currentQuestionIndex <= 0)"
+                      Click="@PrevQuestion">
+            <RadzenIcon Icon="arrow_back"/>
+            Back
+        </RadzenButton>
+
+        <RadzenButton ButtonStyle="ButtonStyle.Primary"
+                      Variant="Variant.Outlined"
+                      Disabled="@(currentQuestionIndex >= questions.Count - 1)"
+                      Click="@NextQuestion">
+            Next
+            <RadzenIcon Icon="arrow_forward" />
+        </RadzenButton>
+
+    </RadzenStack>
+}
+
+@code {
+    int value = 1;
+    [Parameter]
+    public int QuizId { get; set; }
+
+    public int? currentQuestionIndex;
+
+    public class QuestionModel
+    {
+        public int Id { get; set; }
+        public string Content { get; set; }
+        public List<AnswerModel> Answers { get; set; } = new();
+        public int? SelectedAnswerId { get; set; }
+    }
+
+    public class AnswerModel
+    {
+        public int Id { get; set; }
+        public string Content { get; set; }
+    }
+
+    private List<QuestionModel> questions;
+
+    private bool IsAllAnswered => questions != null && questions.All(q => q.SelectedAnswerId.HasValue);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(500); 
+
+        questions = new List<QuestionModel>
+        {
+            new QuestionModel
+            {
+                Id = 1,
+                Content = "Co oznacza skrót WASM?",
+                Answers = new List<AnswerModel> {
+                    new AnswerModel { Id = 1, Content = "Web All System Memory" },
+                    new AnswerModel { Id = 2, Content = "WebAssembly" },
+                    new AnswerModel { Id = 3, Content = "Windows Application Service Manager" }
+                }
+            },
+            new QuestionModel
+            {
+                Id = 2,
+                Content = "Który plik służy do zarządzania globalnymi importami w Blazor?",
+                Answers = new List<AnswerModel> {
+                    new AnswerModel { Id = 4, Content = "Program.cs" },
+                    new AnswerModel { Id = 5, Content = "App.razor" },
+                    new AnswerModel { Id = 6, Content = "_Imports.razor" }
+                }
+            },
+            new QuestionModel
+            {
+                Id = 3,
+                Content = "Jaka dyrektywa służy do wstrzykiwania zależności?",
+                Answers = new List<AnswerModel> {
+                    new AnswerModel { Id = 7, Content = "@inject" },
+                    new AnswerModel { Id = 8, Content = "@using" },
+                    new AnswerModel { Id = 9, Content = "@implements" }
+                }
+            }
+        };
+
+        currentQuestionIndex = 0;
+    }
+
+    private void GoToQuestion(int questionIndex)
+    {
+        if (questionIndex >= questions.Count)
+            return;
+        currentQuestionIndex = questionIndex;
+    }
+
+    private void NextQuestion()
+    {
+        if (currentQuestionIndex < questions.Count - 1)
+        {
+            currentQuestionIndex++;
+        }
+    }
+
+    private void PrevQuestion()
+    {
+        if (currentQuestionIndex > 0)
+        {
+            currentQuestionIndex--;
+        }
+    }
+}
