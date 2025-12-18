@@ -1,0 +1,33 @@
+﻿@page "/quizzes"
+@inject NavigationManager NavManager
+
+<PageTitle>Quizzes</PageTitle>
+
+@foreach (var quiz in quizzes) {
+    <RadzenCard class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
+            <RadzenStack Gap="0">
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Test</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@quiz.Name</b></RadzenText>
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">@quiz.Questions Questions</RadzenText>
+                <RadzenLink Path="@($"/quizattempt/{quiz.Id}")" TextStyle="TextStyle.Body1"><b>Start attempt</b></RadzenLink>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+}
+
+@code {
+    public record Quiz(int Id, string Name, int Questions);
+
+    IEnumerable<Quiz> quizzes;
+    protected override Task OnInitializedAsync()
+    {
+        quizzes = new List<Quiz>()
+        {
+            new Quiz(1, "Test", 4),
+            new Quiz(2, "Test 2", 12),
+            new Quiz(3, "Test 3", 10),
+        };
+        return base.OnInitializedAsync();
+    }
+}
