@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Quizzy.Domain\Quizzy.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

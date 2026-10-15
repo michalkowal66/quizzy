@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Quizzy.Api/Quizzy.Api.csproj" />
+    <Project Path="src/Quizzy.Application/Quizzy.Application.csproj" />
+    <Project Path="src/Quizzy.Domain/Quizzy.Domain.csproj" />
+    <Project Path="src/Quizzy.Infrastructure/Quizzy.Infrastructure.csproj" />
+  </Folder>
+</Solution>
