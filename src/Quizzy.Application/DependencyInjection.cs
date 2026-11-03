@@ -1,7 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
+using Quizzy.Application.Attempts;
 using Quizzy.Application.Decks;
 using Quizzy.Application.Flashcards;
 using Quizzy.Application.Folders;
+using Quizzy.Application.Questions;
+using Quizzy.Application.Quizzes;
 
 namespace Quizzy.Application;
 
@@ -12,6 +15,9 @@ public static class DependencyInjection
         services.AddScoped<IFolderService, FolderService>();
         services.AddScoped<IDeckService, DeckService>();
         services.AddScoped<IFlashcardService, FlashcardService>();
+        services.AddScoped<IQuizService, QuizService>();
+        services.AddScoped<IQuestionService, QuestionService>();
+        services.AddScoped<IAttemptService, AttemptService>();
 
         return services;
     }

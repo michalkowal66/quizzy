@@ -16,5 +16,15 @@ public interface IApplicationDbContext
 
     DbSet<Flashcard> Flashcards { get; }
 
+    DbSet<Quiz> Quizzes { get; }
+
+    DbSet<Question> Questions { get; }
+
+    DbSet<AnswerOption> AnswerOptions { get; }
+
+    DbSet<QuizAttempt> QuizAttempts { get; }
+
+    DbSet<AttemptAnswer> AttemptAnswers { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

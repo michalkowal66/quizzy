@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using Quizzy.Api.Middleware;
@@ -17,7 +18,8 @@ builder.Services.AddFastEndpoints();
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseFastEndpoints();
+app.UseFastEndpoints(c =>
+    c.Serializer.Options.Converters.Add(new JsonStringEnumConverter()));
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 

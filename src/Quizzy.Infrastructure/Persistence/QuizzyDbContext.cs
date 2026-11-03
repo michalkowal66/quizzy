@@ -19,6 +19,16 @@ public class QuizzyDbContext : DbContext, IApplicationDbContext
 
     public DbSet<Flashcard> Flashcards => Set<Flashcard>();
 
+    public DbSet<Quiz> Quizzes => Set<Quiz>();
+
+    public DbSet<Question> Questions => Set<Question>();
+
+    public DbSet<AnswerOption> AnswerOptions => Set<AnswerOption>();
+
+    public DbSet<QuizAttempt> QuizAttempts => Set<QuizAttempt>();
+
+    public DbSet<AttemptAnswer> AttemptAnswers => Set<AttemptAnswer>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(QuizzyDbContext).Assembly);
