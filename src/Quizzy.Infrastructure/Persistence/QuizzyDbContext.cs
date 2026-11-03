@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Quizzy.Application.Common.Interfaces;
 using Quizzy.Domain.Entities;
 
 namespace Quizzy.Infrastructure.Persistence;
 
-public class QuizzyDbContext : DbContext
+public class QuizzyDbContext : DbContext, IApplicationDbContext
 {
     public QuizzyDbContext(DbContextOptions<QuizzyDbContext> options)
         : base(options)

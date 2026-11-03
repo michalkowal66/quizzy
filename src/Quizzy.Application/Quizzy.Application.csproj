@@ -4,4 +4,8 @@
     <ProjectReference Include="..\Quizzy.Domain\Quizzy.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
+  </ItemGroup>
+
 </Project>
