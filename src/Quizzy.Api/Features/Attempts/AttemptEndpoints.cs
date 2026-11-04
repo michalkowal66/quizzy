@@ -42,7 +42,6 @@ public class SubmitAttemptEndpoint : Endpoint<SubmitAttemptRequest, AttemptResul
     public override void Configure()
     {
         Post("/quizzes/{quizId}/attempts");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(SubmitAttemptRequest req, CancellationToken ct)
@@ -66,7 +65,6 @@ public class ListAttemptsEndpoint : EndpointWithoutRequest<IReadOnlyList<Attempt
     public override void Configure()
     {
         Get("/quizzes/{quizId}/attempts");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

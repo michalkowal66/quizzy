@@ -36,6 +36,7 @@ public class ExceptionHandlingMiddleware
             NotFoundException => (StatusCodes.Status404NotFound, "Resource not found"),
             ConflictException => (StatusCodes.Status409Conflict, "Conflict"),
             ForbiddenAccessException => (StatusCodes.Status403Forbidden, "Forbidden"),
+            UnauthorizedException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
             BadRequestException => (StatusCodes.Status400BadRequest, "Invalid request"),
             _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred"),
         };

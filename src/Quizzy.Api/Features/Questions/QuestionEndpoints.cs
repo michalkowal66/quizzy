@@ -52,7 +52,6 @@ public class CreateQuestionEndpoint : Endpoint<CreateQuestionRequest, QuestionDt
     public override void Configure()
     {
         Post("/quizzes/{quizId}/questions");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CreateQuestionRequest req, CancellationToken ct)
@@ -74,7 +73,6 @@ public class ListQuestionsEndpoint : EndpointWithoutRequest<IReadOnlyList<Questi
     public override void Configure()
     {
         Get("/quizzes/{quizId}/questions");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -127,7 +125,6 @@ public class UpdateQuestionEndpoint : Endpoint<UpdateQuestionRequest, QuestionDt
     public override void Configure()
     {
         Put("/quizzes/{quizId}/questions/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(UpdateQuestionRequest req, CancellationToken ct)
@@ -147,7 +144,6 @@ public class DeleteQuestionEndpoint : EndpointWithoutRequest
     public override void Configure()
     {
         Delete("/quizzes/{quizId}/questions/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

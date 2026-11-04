@@ -5,5 +5,8 @@ namespace Quizzy.Application.Common.Interfaces;
 /// </summary>
 public interface ICurrentUserService
 {
+    /// <summary>The authenticated user's identifier.</summary>
     Guid UserId { get; }
+
+    bool IsAuthenticated { get; }
 }

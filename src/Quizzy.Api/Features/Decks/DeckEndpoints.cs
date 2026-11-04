@@ -35,7 +35,6 @@ public class CreateDeckEndpoint : Endpoint<CreateDeckRequest, DeckDto>
     public override void Configure()
     {
         Post("/decks");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CreateDeckRequest req, CancellationToken ct)
@@ -55,7 +54,6 @@ public class ListDecksEndpoint : EndpointWithoutRequest<IReadOnlyList<DeckDto>>
     public override void Configure()
     {
         Get("/decks");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -74,7 +72,6 @@ public class GetDeckEndpoint : EndpointWithoutRequest<DeckDto>
     public override void Configure()
     {
         Get("/decks/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -118,7 +115,6 @@ public class UpdateDeckEndpoint : Endpoint<UpdateDeckRequest, DeckDto>
     public override void Configure()
     {
         Put("/decks/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(UpdateDeckRequest req, CancellationToken ct)
@@ -138,7 +134,6 @@ public class DeleteDeckEndpoint : EndpointWithoutRequest
     public override void Configure()
     {
         Delete("/decks/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

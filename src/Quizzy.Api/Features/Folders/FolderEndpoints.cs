@@ -28,7 +28,6 @@ public class CreateFolderEndpoint : Endpoint<CreateFolderRequest, FolderDto>
     public override void Configure()
     {
         Post("/folders");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CreateFolderRequest req, CancellationToken ct)
@@ -47,7 +46,6 @@ public class ListFoldersEndpoint : EndpointWithoutRequest<IReadOnlyList<FolderDt
     public override void Configure()
     {
         Get("/folders");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -66,7 +64,6 @@ public class GetFolderEndpoint : EndpointWithoutRequest<FolderDto>
     public override void Configure()
     {
         Get("/folders/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -103,7 +100,6 @@ public class RenameFolderEndpoint : Endpoint<RenameFolderRequest, FolderDto>
     public override void Configure()
     {
         Put("/folders/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(RenameFolderRequest req, CancellationToken ct)
@@ -122,7 +118,6 @@ public class DeleteFolderEndpoint : EndpointWithoutRequest
     public override void Configure()
     {
         Delete("/folders/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

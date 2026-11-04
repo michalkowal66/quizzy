@@ -36,7 +36,6 @@ public class CreateFlashcardEndpoint : Endpoint<CreateFlashcardRequest, Flashcar
     public override void Configure()
     {
         Post("/decks/{deckId}/flashcards");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CreateFlashcardRequest req, CancellationToken ct)
@@ -55,7 +54,6 @@ public class ListFlashcardsEndpoint : EndpointWithoutRequest<IReadOnlyList<Flash
     public override void Configure()
     {
         Get("/decks/{deckId}/flashcards");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -100,7 +98,6 @@ public class UpdateFlashcardEndpoint : Endpoint<UpdateFlashcardRequest, Flashcar
     public override void Configure()
     {
         Put("/decks/{deckId}/flashcards/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(UpdateFlashcardRequest req, CancellationToken ct)
@@ -119,7 +116,6 @@ public class DeleteFlashcardEndpoint : EndpointWithoutRequest
     public override void Configure()
     {
         Delete("/decks/{deckId}/flashcards/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

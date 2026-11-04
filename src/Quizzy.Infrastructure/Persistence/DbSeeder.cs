@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Quizzy.Application.Common.Interfaces;
 using Quizzy.Domain.Entities;
 using Quizzy.Domain.Enums;
 
@@ -9,28 +11,35 @@ namespace Quizzy.Infrastructure.Persistence;
 /// </summary>
 public static class DbSeeder
 {
-    /// <summary>
-    /// Identifier of the default account that owns resources until sign-in is wired up.
-    /// </summary>
-    public static readonly Guid DefaultUserId = new("11111111-1111-1111-1111-111111111111");
-
-    public static async Task SeedAsync(QuizzyDbContext db, CancellationToken cancellationToken = default)
+    public static async Task SeedAsync(
+        QuizzyDbContext db,
+        IPasswordHasher passwordHasher,
+        IConfiguration configuration,
+        CancellationToken cancellationToken = default)
     {
-        var defaultUserExists = await db.Users
-            .AnyAsync(u => u.Id == DefaultUserId, cancellationToken);
+        var email = configuration["Seed:AdminEmail"];
+        var password = configuration["Seed:AdminPassword"];
 
-        if (!defaultUserExists)
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
         {
-            db.Users.Add(new User
-            {
-                Id = DefaultUserId,
-                Email = "demo@quizzy.local",
-                DisplayName = "Demo User",
-                PasswordHash = string.Empty,
-                Role = UserRole.User,
-            });
-
-            await db.SaveChangesAsync(cancellationToken);
+            return;
         }
+
+        email = email.Trim().ToLowerInvariant();
+
+        if (await db.Users.AnyAsync(u => u.Email == email, cancellationToken))
+        {
+            return;
+        }
+
+        db.Users.Add(new User
+        {
+            Email = email,
+            DisplayName = "Administrator",
+            PasswordHash = passwordHasher.Hash(password),
+            Role = UserRole.Admin,
+        });
+
+        await db.SaveChangesAsync(cancellationToken);
     }
 }

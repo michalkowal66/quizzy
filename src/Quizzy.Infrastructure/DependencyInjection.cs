@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quizzy.Application.Common.Interfaces;
 using Quizzy.Infrastructure.Persistence;
+using Quizzy.Infrastructure.Security;
 
 namespace Quizzy.Infrastructure;
 
@@ -20,6 +21,10 @@ public static class DependencyInjection
             options.UseNpgsql(connectionString));
 
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<QuizzyDbContext>());
+
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
         return services;
     }

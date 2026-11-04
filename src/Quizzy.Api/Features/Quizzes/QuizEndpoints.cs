@@ -35,7 +35,6 @@ public class CreateQuizEndpoint : Endpoint<CreateQuizRequest, QuizDto>
     public override void Configure()
     {
         Post("/quizzes");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CreateQuizRequest req, CancellationToken ct)
@@ -55,7 +54,6 @@ public class ListQuizzesEndpoint : EndpointWithoutRequest<IReadOnlyList<QuizDto>
     public override void Configure()
     {
         Get("/quizzes");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -74,7 +72,6 @@ public class GetQuizEndpoint : EndpointWithoutRequest<QuizDto>
     public override void Configure()
     {
         Get("/quizzes/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -118,7 +115,6 @@ public class UpdateQuizEndpoint : Endpoint<UpdateQuizRequest, QuizDto>
     public override void Configure()
     {
         Put("/quizzes/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(UpdateQuizRequest req, CancellationToken ct)
@@ -138,7 +134,6 @@ public class DeleteQuizEndpoint : EndpointWithoutRequest
     public override void Configure()
     {
         Delete("/quizzes/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
