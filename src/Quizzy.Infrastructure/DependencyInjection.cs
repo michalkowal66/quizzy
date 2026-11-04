@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +23,19 @@ public static class DependencyInjection
 
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<QuizzyDbContext>());
 
-        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.AddOptions<JwtSettings>()
+            .Bind(configuration.GetSection(JwtSettings.SectionName))
+            .Validate(
+                s => !string.IsNullOrWhiteSpace(s.SigningKey),
+                "Jwt:SigningKey must be configured (provide it via environment or user-secrets).")
+            .Validate(
+                s => string.IsNullOrEmpty(s.SigningKey) || Encoding.UTF8.GetByteCount(s.SigningKey) >= 32,
+                "Jwt:SigningKey must be at least 32 bytes long.")
+            .Validate(
+                s => !string.IsNullOrWhiteSpace(s.Issuer) && !string.IsNullOrWhiteSpace(s.Audience),
+                "Jwt:Issuer and Jwt:Audience must be configured.")
+            .ValidateOnStart();
+
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<IJwtTokenService, JwtTokenService>();
 

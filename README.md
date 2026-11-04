@@ -33,21 +33,32 @@ frontend/                React + TypeScript single-page application
 Prerequisites: .NET 10 SDK, Docker, Node.js.
 
 ```bash
-# 1. Configure environment
+# 1. Start infrastructure
 cp .env.example .env            # then edit values
-
-# 2. Start infrastructure (PostgreSQL)
 docker compose up -d postgres
+
+# 2. Provide the local JWT signing key
+dotnet user-secrets set "Jwt:SigningKey" "<a-long-random-secret>" --project src/Quizzy.Api
 
 # 3. Run the API
 dotnet run --project src/Quizzy.Api
-# API available at http://localhost:5xxx — health check at /health
 ```
 
-Full `docker compose up` for the whole stack (backend, frontend, database, broker) is
-added in a later stage.
+- Health check: `GET /health`
+- API documentation (Swagger UI): `/swagger`
 
-## Documentation
+## Configuration
 
-- Data model diagram (ERD) — _added later_
-- REST API documentation (Swagger / OpenAPI) — _added later_
+Configuration is layered: `appsettings.json` holds non-sensitive defaults, environment
+variables (and `.env` for Docker) override them, and local secrets live in .NET
+user-secrets. Nested keys use `__` as the separator in environment variables.
+
+| Key                                      | Required | Description                                                 |
+| ---------------------------------------- | -------- | ----------------------------------------------------------- |
+| `ConnectionStrings:Postgres`             | yes      | PostgreSQL connection string                                |
+| `Jwt:SigningKey`                         | yes      | Secret used to sign access tokens (min. 32 bytes)           |
+| `Jwt:Issuer` / `Jwt:Audience`            | yes      | Token issuer and audience (defaulted in `appsettings.json`) |
+| `Jwt:ExpiryMinutes`                      | no       | Access-token lifetime (default 60)                          |
+| `Seed:AdminEmail` / `Seed:AdminPassword` | no       | When both are set, an admin account is created on first run |
+
+Missing or invalid configuration fails fast at startup.
