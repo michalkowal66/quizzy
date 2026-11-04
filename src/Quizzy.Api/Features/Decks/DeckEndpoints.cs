@@ -1,5 +1,6 @@
 using FastEndpoints;
 using FluentValidation;
+using Quizzy.Application.Common;
 using Quizzy.Application.Decks;
 
 namespace Quizzy.Api.Features.Decks;
@@ -45,7 +46,18 @@ public class CreateDeckEndpoint : Endpoint<CreateDeckRequest, DeckDto>
     }
 }
 
-public class ListDecksEndpoint : EndpointWithoutRequest<IReadOnlyList<DeckDto>>
+public class ListDecksRequest
+{
+    public int Page { get; set; } = 1;
+
+    public int PageSize { get; set; } = 20;
+
+    public string? Search { get; set; }
+
+    public Guid? FolderId { get; set; }
+}
+
+public class ListDecksEndpoint : Endpoint<ListDecksRequest, PagedResult<DeckDto>>
 {
     private readonly IDeckService _decks;
 
@@ -56,10 +68,11 @@ public class ListDecksEndpoint : EndpointWithoutRequest<IReadOnlyList<DeckDto>>
         Get("/decks");
     }
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public override async Task HandleAsync(ListDecksRequest req, CancellationToken ct)
     {
-        var decks = await _decks.GetAllAsync(ct);
-        await Send.OkAsync(decks, ct);
+        var result = await _decks.GetPagedAsync(
+            new PageQuery(req.Page, req.PageSize, req.Search), req.FolderId, ct);
+        await Send.OkAsync(result, ct);
     }
 }
 

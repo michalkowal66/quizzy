@@ -1,5 +1,6 @@
 using FastEndpoints;
 using FluentValidation;
+using Quizzy.Application.Common;
 using Quizzy.Application.Quizzes;
 
 namespace Quizzy.Api.Features.Quizzes;
@@ -45,7 +46,18 @@ public class CreateQuizEndpoint : Endpoint<CreateQuizRequest, QuizDto>
     }
 }
 
-public class ListQuizzesEndpoint : EndpointWithoutRequest<IReadOnlyList<QuizDto>>
+public class ListQuizzesRequest
+{
+    public int Page { get; set; } = 1;
+
+    public int PageSize { get; set; } = 20;
+
+    public string? Search { get; set; }
+
+    public Guid? FolderId { get; set; }
+}
+
+public class ListQuizzesEndpoint : Endpoint<ListQuizzesRequest, PagedResult<QuizDto>>
 {
     private readonly IQuizService _quizzes;
 
@@ -56,10 +68,11 @@ public class ListQuizzesEndpoint : EndpointWithoutRequest<IReadOnlyList<QuizDto>
         Get("/quizzes");
     }
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public override async Task HandleAsync(ListQuizzesRequest req, CancellationToken ct)
     {
-        var quizzes = await _quizzes.GetAllAsync(ct);
-        await Send.OkAsync(quizzes, ct);
+        var result = await _quizzes.GetPagedAsync(
+            new PageQuery(req.Page, req.PageSize, req.Search), req.FolderId, ct);
+        await Send.OkAsync(result, ct);
     }
 }
 

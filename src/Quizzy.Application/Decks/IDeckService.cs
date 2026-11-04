@@ -1,8 +1,10 @@
+using Quizzy.Application.Common;
+
 namespace Quizzy.Application.Decks;
 
 public interface IDeckService
 {
-    Task<IReadOnlyList<DeckDto>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<PagedResult<DeckDto>> GetPagedAsync(PageQuery query, Guid? folderId, CancellationToken cancellationToken = default);
 
     Task<DeckDto> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 

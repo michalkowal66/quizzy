@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Quizzy.Application.Common;
 using Quizzy.Application.Common.Exceptions;
 using Quizzy.Application.Common.Interfaces;
 using Quizzy.Domain.Entities;
@@ -26,13 +27,31 @@ public class QuizService : IQuizService
         _currentUser = currentUser;
     }
 
-    public async Task<IReadOnlyList<QuizDto>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<PagedResult<QuizDto>> GetPagedAsync(PageQuery query, Guid? folderId, CancellationToken cancellationToken = default)
     {
-        return await _db.Quizzes
-            .Where(q => q.OwnerId == _currentUser.UserId)
+        var quizzes = _db.Quizzes.Where(q => q.OwnerId == _currentUser.UserId);
+
+        if (folderId is not null)
+        {
+            quizzes = quizzes.Where(q => q.FolderId == folderId);
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.Search))
+        {
+            var term = query.Search.Trim().ToLower();
+            quizzes = quizzes.Where(q => q.Title.ToLower().Contains(term));
+        }
+
+        var totalCount = await quizzes.CountAsync(cancellationToken);
+
+        var items = await quizzes
             .OrderByDescending(q => q.CreatedAt)
+            .Skip((query.NormalizedPage - 1) * query.NormalizedPageSize)
+            .Take(query.NormalizedPageSize)
             .Select(Projection)
             .ToListAsync(cancellationToken);
+
+        return new PagedResult<QuizDto>(items, query.NormalizedPage, query.NormalizedPageSize, totalCount);
     }
 
     public async Task<QuizDto> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)

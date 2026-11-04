@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Quizzy.Application.Common;
 using Quizzy.Application.Common.Exceptions;
 using Quizzy.Application.Common.Interfaces;
 using Quizzy.Domain.Entities;
@@ -26,13 +27,31 @@ public class DeckService : IDeckService
         _currentUser = currentUser;
     }
 
-    public async Task<IReadOnlyList<DeckDto>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<PagedResult<DeckDto>> GetPagedAsync(PageQuery query, Guid? folderId, CancellationToken cancellationToken = default)
     {
-        return await _db.Decks
-            .Where(d => d.OwnerId == _currentUser.UserId)
+        var decks = _db.Decks.Where(d => d.OwnerId == _currentUser.UserId);
+
+        if (folderId is not null)
+        {
+            decks = decks.Where(d => d.FolderId == folderId);
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.Search))
+        {
+            var term = query.Search.Trim().ToLower();
+            decks = decks.Where(d => d.Title.ToLower().Contains(term));
+        }
+
+        var totalCount = await decks.CountAsync(cancellationToken);
+
+        var items = await decks
             .OrderByDescending(d => d.CreatedAt)
+            .Skip((query.NormalizedPage - 1) * query.NormalizedPageSize)
+            .Take(query.NormalizedPageSize)
             .Select(Projection)
             .ToListAsync(cancellationToken);
+
+        return new PagedResult<DeckDto>(items, query.NormalizedPage, query.NormalizedPageSize, totalCount);
     }
 
     public async Task<DeckDto> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)

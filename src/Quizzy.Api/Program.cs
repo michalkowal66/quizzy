@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using FastEndpoints;
+using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -44,6 +45,15 @@ builder.Services
 
 builder.Services.AddAuthorization();
 builder.Services.AddFastEndpoints();
+builder.Services.SwaggerDocument(o =>
+{
+    o.EnableJWTBearerAuth = true;
+    o.DocumentSettings = s =>
+    {
+        s.Title = "Quizzy API";
+        s.Version = "v1";
+    };
+});
 
 var app = builder.Build();
 
@@ -52,6 +62,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints(c =>
     c.Serializer.Options.Converters.Add(new JsonStringEnumConverter()));
+app.UseSwaggerGen();
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
