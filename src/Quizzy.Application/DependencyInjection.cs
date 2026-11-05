@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using Quizzy.Application.Activities;
 using Quizzy.Application.Attempts;
 using Quizzy.Application.Auth;
+using Quizzy.Application.Dashboard;
 using Quizzy.Application.Decks;
 using Quizzy.Application.Flashcards;
 using Quizzy.Application.Folders;
@@ -23,6 +25,8 @@ public static class DependencyInjection
         services.AddScoped<IQuizService, QuizService>();
         services.AddScoped<IQuestionService, QuestionService>();
         services.AddScoped<IAttemptService, AttemptService>();
+        services.AddScoped<IStudyActivityService, StudyActivityService>();
+        services.AddScoped<IDashboardService, DashboardService>();
 
         return services;
     }

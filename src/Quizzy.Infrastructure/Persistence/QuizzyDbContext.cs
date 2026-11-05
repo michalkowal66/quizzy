@@ -29,6 +29,8 @@ public class QuizzyDbContext : DbContext, IApplicationDbContext
 
     public DbSet<AttemptAnswer> AttemptAnswers => Set<AttemptAnswer>();
 
+    public DbSet<StudyActivity> StudyActivities => Set<StudyActivity>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(QuizzyDbContext).Assembly);

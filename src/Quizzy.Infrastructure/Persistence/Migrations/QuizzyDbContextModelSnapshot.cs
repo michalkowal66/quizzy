@@ -263,6 +263,29 @@ namespace Quizzy.Infrastructure.Persistence.Migrations
                     b.ToTable("quiz_attempts", (string)null);
                 });
 
+            modelBuilder.Entity("Quizzy.Domain.Entities.StudyActivity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Date")
+                        .IsUnique();
+
+                    b.ToTable("study_activities", (string)null);
+                });
+
             modelBuilder.Entity("Quizzy.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -405,6 +428,17 @@ namespace Quizzy.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Quiz");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Quizzy.Domain.Entities.StudyActivity", b =>
+                {
+                    b.HasOne("Quizzy.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

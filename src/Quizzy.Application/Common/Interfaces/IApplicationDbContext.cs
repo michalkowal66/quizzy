@@ -26,5 +26,7 @@ public interface IApplicationDbContext
 
     DbSet<AttemptAnswer> AttemptAnswers { get; }
 
+    DbSet<StudyActivity> StudyActivities { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

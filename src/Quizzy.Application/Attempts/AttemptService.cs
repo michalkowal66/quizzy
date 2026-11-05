@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Quizzy.Application.Activities;
 using Quizzy.Application.Common.Exceptions;
 using Quizzy.Application.Common.Interfaces;
 using Quizzy.Domain.Entities;
@@ -9,11 +10,16 @@ public class AttemptService : IAttemptService
 {
     private readonly IApplicationDbContext _db;
     private readonly ICurrentUserService _currentUser;
+    private readonly IStudyActivityService _studyActivity;
 
-    public AttemptService(IApplicationDbContext db, ICurrentUserService currentUser)
+    public AttemptService(
+        IApplicationDbContext db,
+        ICurrentUserService currentUser,
+        IStudyActivityService studyActivity)
     {
         _db = db;
         _currentUser = currentUser;
+        _studyActivity = studyActivity;
     }
 
     public async Task<AttemptResultDto> SubmitAsync(Guid quizId, SubmitAttemptInput input, CancellationToken cancellationToken = default)
@@ -64,6 +70,8 @@ public class AttemptService : IAttemptService
 
         _db.QuizAttempts.Add(attempt);
         await _db.SaveChangesAsync(cancellationToken);
+
+        await _studyActivity.RecordTodayAsync(cancellationToken);
 
         return new AttemptResultDto(
             attempt.Id,
