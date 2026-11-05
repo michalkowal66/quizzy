@@ -5,6 +5,7 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Quizzy.Api.Middleware;
 using Quizzy.Api.Services;
@@ -22,22 +23,23 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-var jwtSettings = builder.Configuration
-    .GetSection(JwtSettings.SectionName)
-    .Get<JwtSettings>() ?? new JwtSettings();
-
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+    .AddJwtBearer();
+
+builder.Services
+    .AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+    .Configure<IOptions<JwtSettings>>((options, jwtSettings) =>
     {
+        var settings = jwtSettings.Value;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = jwtSettings.Issuer,
+            ValidIssuer = settings.Issuer,
             ValidateAudience = true,
-            ValidAudience = jwtSettings.Audience,
+            ValidAudience = settings.Audience,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SigningKey)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SigningKey)),
             ValidateLifetime = true,
             RoleClaimType = ClaimTypes.Role,
             NameClaimType = ClaimTypes.NameIdentifier,

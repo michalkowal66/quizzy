@@ -5,4 +5,8 @@
     <Project Path="src/Quizzy.Domain/Quizzy.Domain.csproj" />
     <Project Path="src/Quizzy.Infrastructure/Quizzy.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Quizzy.IntegrationTests/Quizzy.IntegrationTests.csproj" />
+    <Project Path="tests/Quizzy.UnitTests/Quizzy.UnitTests.csproj" />
+  </Folder>
 </Solution>
