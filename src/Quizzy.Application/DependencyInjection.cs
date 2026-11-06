@@ -8,6 +8,7 @@ using Quizzy.Application.Flashcards;
 using Quizzy.Application.Folders;
 using Quizzy.Application.Questions;
 using Quizzy.Application.Quizzes;
+using Quizzy.Application.Scheduling;
 using Quizzy.Application.Users;
 
 namespace Quizzy.Application;
@@ -27,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<IAttemptService, AttemptService>();
         services.AddScoped<IStudyActivityService, StudyActivityService>();
         services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<IStreakReminderService, StreakReminderService>();
 
         return services;
     }

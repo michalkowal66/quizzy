@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Quizzy.Application.Common.Interfaces;
 using Quizzy.Application.Messaging;
 using Quizzy.Infrastructure.Persistence;
+using Quizzy.Infrastructure.Scheduling;
 using Quizzy.Infrastructure.Security;
 
 namespace Quizzy.Infrastructure;
@@ -44,6 +45,7 @@ public static class DependencyInjection
         services.AddMassTransit(bus =>
         {
             bus.AddConsumer<QuizCompletedConsumer>();
+            bus.AddConsumer<StreakReminderConsumer>();
 
             var rabbitHost = configuration["RabbitMq:Host"];
             if (string.IsNullOrWhiteSpace(rabbitHost))
@@ -64,6 +66,8 @@ public static class DependencyInjection
                 });
             }
         });
+
+        services.AddHostedService<StreakReminderScheduler>();
 
         return services;
     }

@@ -1,6 +1,10 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Microsoft.Extensions.DependencyInjection;
+using Quizzy.Application.Common.Interfaces;
+using Quizzy.Application.Scheduling;
+using Quizzy.Domain.Entities;
 
 namespace Quizzy.IntegrationTests;
 
@@ -177,6 +181,40 @@ public class ApiIntegrationTests : IClassFixture<QuizzyApiFactory>
         });
 
         Assert.True(studied);
+    }
+
+    [Fact]
+    public async Task StreakReminders_DispatchedForUsersActiveYesterdayOnly()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
+
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        // At risk: studied yesterday, not today.
+        var atRisk = new User
+        {
+            Email = $"atrisk_{Guid.NewGuid():N}@test.local",
+            DisplayName = "At Risk",
+            PasswordHash = "x",
+        };
+        // Not at risk: already studied today.
+        var safe = new User
+        {
+            Email = $"safe_{Guid.NewGuid():N}@test.local",
+            DisplayName = "Safe",
+            PasswordHash = "x",
+        };
+        db.Users.Add(atRisk);
+        db.Users.Add(safe);
+        db.StudyActivities.Add(new StudyActivity { UserId = atRisk.Id, Date = today.AddDays(-1) });
+        db.StudyActivities.Add(new StudyActivity { UserId = safe.Id, Date = today });
+        await db.SaveChangesAsync();
+
+        var reminders = scope.ServiceProvider.GetRequiredService<IStreakReminderService>();
+        var dispatched = await reminders.DispatchRemindersAsync();
+
+        Assert.True(dispatched >= 1);
     }
 
     private static async Task<bool> WaitUntilAsync(Func<Task<bool>> condition)

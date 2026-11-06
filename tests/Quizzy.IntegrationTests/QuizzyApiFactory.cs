@@ -31,6 +31,7 @@ public class QuizzyApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         Environment.SetEnvironmentVariable("Jwt__SigningKey", TestSigningKey);
         Environment.SetEnvironmentVariable("Seed__AdminEmail", "admin@quizzy.local");
         Environment.SetEnvironmentVariable("Seed__AdminPassword", "Admin123!");
+        Environment.SetEnvironmentVariable("Scheduler__Enabled", "false");
     }
 
     public new async Task DisposeAsync()
@@ -39,6 +40,7 @@ public class QuizzyApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         Environment.SetEnvironmentVariable("Jwt__SigningKey", null);
         Environment.SetEnvironmentVariable("Seed__AdminEmail", null);
         Environment.SetEnvironmentVariable("Seed__AdminPassword", null);
+        Environment.SetEnvironmentVariable("Scheduler__Enabled", null);
 
         await _database.DisposeAsync();
         await base.DisposeAsync();
