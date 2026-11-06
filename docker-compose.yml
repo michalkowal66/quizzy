@@ -1,6 +1,4 @@
-# Local development infrastructure.
-# For now only the database runs here; the backend, frontend and message broker
-# are added as separate services in later stages.
+# Local development infrastructure: database and message broker.
 services:
   postgres:
     image: postgres:17-alpine
@@ -20,5 +18,24 @@ services:
       timeout: 5s
       retries: 5
 
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: quizzy-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-quizzy}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-quizzy}
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   postgres-data:
+  rabbitmq-data:

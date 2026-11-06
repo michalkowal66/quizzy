@@ -139,6 +139,61 @@ public class ApiIntegrationTests : IClassFixture<QuizzyApiFactory>
         Assert.Equal(2, page.TotalPages);
     }
 
+    [Fact]
+    public async Task CompletingQuiz_EventuallyRecordsStudyActivity()
+    {
+        var client = _factory.CreateClient();
+        await AuthenticateAsync(client);
+
+        var fresh = await client.GetFromJsonAsync<DashboardResponse>("/dashboard");
+        Assert.False(fresh!.StudiedToday);
+
+        var quiz = await (await client.PostAsJsonAsync("/quizzes", new { title = "Async" }))
+            .Content.ReadFromJsonAsync<IdResponse>();
+        var question = await (await client.PostAsJsonAsync(
+            $"/quizzes/{quiz!.Id}/questions",
+            new
+            {
+                text = "Capital of France?",
+                type = "SingleChoice",
+                options = new[]
+                {
+                    new { text = "Paris", isCorrect = true },
+                    new { text = "Rome", isCorrect = false },
+                },
+            }))
+            .Content.ReadFromJsonAsync<QuestionResponse>();
+        var correct = question!.Options.Single(o => o.IsCorrect).Id;
+
+        await client.PostAsJsonAsync(
+            $"/quizzes/{quiz.Id}/attempts",
+            new { answers = new[] { new { questionId = question.Id, selectedOptionIds = new[] { correct } } } });
+
+        // The study activity is recorded by the QuizCompleted consumer, off the request thread.
+        var studied = await WaitUntilAsync(async () =>
+        {
+            var dashboard = await client.GetFromJsonAsync<DashboardResponse>("/dashboard");
+            return dashboard!.StudiedToday;
+        });
+
+        Assert.True(studied);
+    }
+
+    private static async Task<bool> WaitUntilAsync(Func<Task<bool>> condition)
+    {
+        for (var attempt = 0; attempt < 50; attempt++)
+        {
+            if (await condition())
+            {
+                return true;
+            }
+
+            await Task.Delay(100);
+        }
+
+        return false;
+    }
+
     private async Task AuthenticateAsync(HttpClient client)
     {
         var email = $"user_{Guid.NewGuid():N}@test.local";
@@ -162,4 +217,6 @@ public class ApiIntegrationTests : IClassFixture<QuizzyApiFactory>
     private record AttemptResponse(int Score, int MaxScore, double Percentage);
 
     private record PagedResponse<T>(List<T> Items, int Page, int PageSize, int TotalCount, int TotalPages);
+
+    private record DashboardResponse(int CurrentStreak, int LongestStreak, bool StudiedToday);
 }

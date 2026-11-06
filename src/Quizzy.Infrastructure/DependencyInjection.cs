@@ -1,8 +1,10 @@
 using System.Text;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quizzy.Application.Common.Interfaces;
+using Quizzy.Application.Messaging;
 using Quizzy.Infrastructure.Persistence;
 using Quizzy.Infrastructure.Security;
 
@@ -38,6 +40,30 @@ public static class DependencyInjection
 
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<IJwtTokenService, JwtTokenService>();
+
+        services.AddMassTransit(bus =>
+        {
+            bus.AddConsumer<QuizCompletedConsumer>();
+
+            var rabbitHost = configuration["RabbitMq:Host"];
+            if (string.IsNullOrWhiteSpace(rabbitHost))
+            {
+                // No broker configured: run the bus in-process (local development and tests).
+                bus.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
+            }
+            else
+            {
+                bus.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(rabbitHost, host =>
+                    {
+                        host.Username(configuration["RabbitMq:Username"] ?? "guest");
+                        host.Password(configuration["RabbitMq:Password"] ?? "guest");
+                    });
+                    cfg.ConfigureEndpoints(context);
+                });
+            }
+        });
 
         return services;
     }

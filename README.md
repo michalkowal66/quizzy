@@ -35,7 +35,7 @@ Prerequisites: .NET 10 SDK, Docker, Node.js.
 ```bash
 # 1. Start infrastructure
 cp .env.example .env            # then edit values
-docker compose up -d postgres
+docker compose up -d postgres rabbitmq
 
 # 2. Provide the local JWT signing key
 dotnet user-secrets set "Jwt:SigningKey" "<a-long-random-secret>" --project src/Quizzy.Api
@@ -46,6 +46,10 @@ dotnet run --project src/Quizzy.Api
 
 - Health check: `GET /health`
 - API documentation (Swagger UI): `/swagger`
+- RabbitMQ management UI: `http://localhost:15672`
+
+When no broker is configured (`RabbitMq:Host` unset), the message bus runs in-process, so
+the API and the test suite work without RabbitMQ.
 
 ## Configuration
 
@@ -60,5 +64,7 @@ user-secrets. Nested keys use `__` as the separator in environment variables.
 | `Jwt:Issuer` / `Jwt:Audience`            | yes      | Token issuer and audience (defaulted in `appsettings.json`) |
 | `Jwt:ExpiryMinutes`                      | no       | Access-token lifetime (default 60)                          |
 | `Seed:AdminEmail` / `Seed:AdminPassword` | no       | When both are set, an admin account is created on first run |
+| `RabbitMq:Host`                          | no       | Message broker host; when unset the bus runs in-process     |
+| `RabbitMq:Username` / `RabbitMq:Password`| no       | Broker credentials (default `guest`)                        |
 
 Missing or invalid configuration fails fast at startup.

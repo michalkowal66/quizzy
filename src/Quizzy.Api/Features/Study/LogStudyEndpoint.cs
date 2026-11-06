@@ -1,5 +1,6 @@
 using FastEndpoints;
 using Quizzy.Application.Activities;
+using Quizzy.Application.Common.Interfaces;
 
 namespace Quizzy.Api.Features.Study;
 
@@ -7,8 +8,13 @@ namespace Quizzy.Api.Features.Study;
 public class LogStudyEndpoint : EndpointWithoutRequest
 {
     private readonly IStudyActivityService _activity;
+    private readonly ICurrentUserService _currentUser;
 
-    public LogStudyEndpoint(IStudyActivityService activity) => _activity = activity;
+    public LogStudyEndpoint(IStudyActivityService activity, ICurrentUserService currentUser)
+    {
+        _activity = activity;
+        _currentUser = currentUser;
+    }
 
     public override void Configure()
     {
@@ -17,7 +23,7 @@ public class LogStudyEndpoint : EndpointWithoutRequest
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        await _activity.RecordTodayAsync(ct);
+        await _activity.RecordForUserAsync(_currentUser.UserId, ct);
         await Send.NoContentAsync(ct);
     }
 }

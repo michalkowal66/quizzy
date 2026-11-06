@@ -1,7 +1,8 @@
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using Quizzy.Application.Activities;
 using Quizzy.Application.Common.Exceptions;
 using Quizzy.Application.Common.Interfaces;
+using Quizzy.Application.Messaging;
 using Quizzy.Domain.Entities;
 
 namespace Quizzy.Application.Attempts;
@@ -10,16 +11,16 @@ public class AttemptService : IAttemptService
 {
     private readonly IApplicationDbContext _db;
     private readonly ICurrentUserService _currentUser;
-    private readonly IStudyActivityService _studyActivity;
+    private readonly IPublishEndpoint _publishEndpoint;
 
     public AttemptService(
         IApplicationDbContext db,
         ICurrentUserService currentUser,
-        IStudyActivityService studyActivity)
+        IPublishEndpoint publishEndpoint)
     {
         _db = db;
         _currentUser = currentUser;
-        _studyActivity = studyActivity;
+        _publishEndpoint = publishEndpoint;
     }
 
     public async Task<AttemptResultDto> SubmitAsync(Guid quizId, SubmitAttemptInput input, CancellationToken cancellationToken = default)
@@ -71,7 +72,17 @@ public class AttemptService : IAttemptService
         _db.QuizAttempts.Add(attempt);
         await _db.SaveChangesAsync(cancellationToken);
 
-        await _studyActivity.RecordTodayAsync(cancellationToken);
+        await _publishEndpoint.Publish(
+            new QuizCompleted
+            {
+                AttemptId = attempt.Id,
+                QuizId = quizId,
+                UserId = attempt.UserId,
+                Score = score,
+                MaxScore = maxScore,
+                CompletedAt = attempt.CreatedAt,
+            },
+            cancellationToken);
 
         return new AttemptResultDto(
             attempt.Id,

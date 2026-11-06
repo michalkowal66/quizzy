@@ -7,17 +7,11 @@ namespace Quizzy.Application.Activities;
 public class StudyActivityService : IStudyActivityService
 {
     private readonly IApplicationDbContext _db;
-    private readonly ICurrentUserService _currentUser;
 
-    public StudyActivityService(IApplicationDbContext db, ICurrentUserService currentUser)
-    {
-        _db = db;
-        _currentUser = currentUser;
-    }
+    public StudyActivityService(IApplicationDbContext db) => _db = db;
 
-    public async Task RecordTodayAsync(CancellationToken cancellationToken = default)
+    public async Task RecordForUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        var userId = _currentUser.UserId;
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         var alreadyRecorded = await _db.StudyActivities
