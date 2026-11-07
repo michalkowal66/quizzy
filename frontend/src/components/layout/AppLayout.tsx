@@ -1,19 +1,22 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
-import { Button } from '@/components/ui/button'
-import { useAuth } from '@/features/auth/use-auth'
-import { cn } from '@/lib/utils'
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/features/auth/use-auth";
+import { cn } from "@/lib/utils";
 
-const navItems = [{ to: '/', label: 'Dashboard', end: true }]
+const navItems = [
+  { to: "/", label: "Dashboard", end: true },
+  { to: "/decks", label: "Decks", end: false },
+];
 
 export function AppLayout() {
-  const { user, signOut } = useAuth()
-  const navigate = useNavigate()
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const handleSignOut = () => {
-    signOut()
-    navigate('/login')
-  }
+    signOut();
+    navigate("/login");
+  };
 
   return (
     <div className="min-h-screen">
@@ -28,10 +31,10 @@ export function AppLayout() {
                 end={item.end}
                 className={({ isActive }) =>
                   cn(
-                    'rounded-md px-3 py-1.5 text-sm transition-colors',
+                    "rounded-md px-3 py-1.5 text-sm transition-colors",
                     isActive
-                      ? 'bg-secondary text-secondary-foreground'
-                      : 'text-muted-foreground hover:text-foreground',
+                      ? "bg-secondary text-secondary-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )
                 }
               >
@@ -40,7 +43,9 @@ export function AppLayout() {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">{user?.displayName}</span>
+            <span className="text-sm text-muted-foreground">
+              {user?.displayName}
+            </span>
             <Button variant="outline" size="sm" onClick={handleSignOut}>
               Sign out
             </Button>
@@ -51,5 +56,5 @@ export function AppLayout() {
         <Outlet />
       </main>
     </div>
-  )
+  );
 }

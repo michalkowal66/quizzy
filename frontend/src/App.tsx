@@ -1,12 +1,15 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
-import { AppLayout } from '@/components/layout/AppLayout'
-import { AuthProvider } from '@/features/auth/AuthProvider'
-import { LoginPage } from '@/features/auth/LoginPage'
-import { RegisterPage } from '@/features/auth/RegisterPage'
-import { DashboardPage } from '@/features/dashboard/DashboardPage'
-import { ProtectedRoute } from '@/routes/ProtectedRoute'
+import { AppLayout } from "@/components/layout/AppLayout";
+import { AuthProvider } from "@/features/auth/AuthProvider";
+import { LoginPage } from "@/features/auth/LoginPage";
+import { RegisterPage } from "@/features/auth/RegisterPage";
+import { DashboardPage } from "@/features/dashboard/DashboardPage";
+import { DeckDetailPage } from "@/features/decks/DeckDetailPage";
+import { DecksPage } from "@/features/decks/DecksPage";
+import { StudyPage } from "@/features/study/StudyPage";
+import { ProtectedRoute } from "@/routes/ProtectedRoute";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -15,7 +18,7 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
     },
   },
-})
+});
 
 export default function App() {
   return (
@@ -28,6 +31,9 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
               <Route element={<AppLayout />}>
                 <Route index element={<DashboardPage />} />
+                <Route path="decks" element={<DecksPage />} />
+                <Route path="decks/:deckId" element={<DeckDetailPage />} />
+                <Route path="decks/:deckId/study" element={<StudyPage />} />
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
@@ -35,5 +41,5 @@ export default function App() {
         </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>
-  )
+  );
 }
