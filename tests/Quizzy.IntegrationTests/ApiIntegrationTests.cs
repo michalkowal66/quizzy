@@ -108,6 +108,58 @@ public class ApiIntegrationTests : IClassFixture<QuizzyApiFactory>
     }
 
     [Fact]
+    public async Task UpdatingQuestion_ReplacesItsOptions()
+    {
+        var client = _factory.CreateClient();
+        await AuthenticateAsync(client);
+
+        var quiz = await (await client.PostAsJsonAsync("/quizzes", new { title = "Editable" }))
+            .Content.ReadFromJsonAsync<IdResponse>();
+
+        var created = await (await client.PostAsJsonAsync(
+            $"/quizzes/{quiz!.Id}/questions",
+            new
+            {
+                text = "Original?",
+                type = "SingleChoice",
+                options = new[]
+                {
+                    new { text = "Old A", isCorrect = true },
+                    new { text = "Old B", isCorrect = false },
+                },
+            }))
+            .Content.ReadFromJsonAsync<QuestionResponse>();
+
+        // Swap the whole option set: different count, texts and correct answers.
+        var update = await client.PutAsJsonAsync(
+            $"/quizzes/{quiz.Id}/questions/{created!.Id}",
+            new
+            {
+                text = "Updated?",
+                type = "MultipleChoice",
+                options = new[]
+                {
+                    new { text = "New A", isCorrect = true },
+                    new { text = "New B", isCorrect = true },
+                    new { text = "New C", isCorrect = false },
+                },
+            });
+
+        Assert.Equal(HttpStatusCode.OK, update.StatusCode);
+
+        var questions = await client.GetFromJsonAsync<List<QuestionResponse>>(
+            $"/quizzes/{quiz.Id}/questions");
+        var question = Assert.Single(questions!);
+
+        Assert.Equal("Updated?", question.Text);
+        var optionTexts = question.Options.Select(o => o.Text).ToList();
+        Assert.Equal(3, optionTexts.Count);
+        Assert.Contains("New A", optionTexts);
+        Assert.DoesNotContain("Old A", optionTexts);
+        Assert.Equal(2, question.Options.Count(o => o.IsCorrect));
+    }
+
+    [Fact]
     public async Task AdminEndpoint_EnforcesRole()
     {
         var user = _factory.CreateClient();
