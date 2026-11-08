@@ -23,6 +23,21 @@ public class StudyActivityService : IStudyActivityService
         }
 
         _db.StudyActivities.Add(new StudyActivity { UserId = userId, Date = today });
-        await _db.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            var recorded = await _db.StudyActivities
+                .AsNoTracking()
+                .AnyAsync(a => a.UserId == userId && a.Date == today, cancellationToken);
+
+            if (!recorded)
+            {
+                throw;
+            }
+        }
     }
 }
