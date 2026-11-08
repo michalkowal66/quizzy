@@ -73,10 +73,18 @@ public class QuestionService : IQuestionService
         question.Text = input.Text.Trim();
         question.Type = input.Type;
 
-        _db.AnswerOptions.RemoveRange(question.Options);
-        question.Options = input.Options
-            .Select(o => new AnswerOption { Text = o.Text.Trim(), IsCorrect = o.IsCorrect })
+        var newOptions = input.Options
+            .Select(o => new AnswerOption
+            {
+                QuestionId = question.Id,
+                Text = o.Text.Trim(),
+                IsCorrect = o.IsCorrect,
+            })
             .ToList();
+
+        _db.AnswerOptions.RemoveRange(question.Options);
+        _db.AnswerOptions.AddRange(newOptions);
+        question.Options = newOptions;
 
         await _db.SaveChangesAsync(cancellationToken);
 
