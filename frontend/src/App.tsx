@@ -8,6 +8,9 @@ import { RegisterPage } from "@/features/auth/RegisterPage";
 import { DashboardPage } from "@/features/dashboard/DashboardPage";
 import { DeckDetailPage } from "@/features/decks/DeckDetailPage";
 import { DecksPage } from "@/features/decks/DecksPage";
+import { QuizDetailPage } from "@/features/quizzes/QuizDetailPage";
+import { QuizzesPage } from "@/features/quizzes/QuizzesPage";
+import { SolvePage } from "@/features/quizzes/SolvePage";
 import { StudyPage } from "@/features/study/StudyPage";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 
@@ -34,6 +37,12 @@ export default function App() {
                 <Route path="decks" element={<DecksPage />} />
                 <Route path="decks/:deckId" element={<DeckDetailPage />} />
                 <Route path="decks/:deckId/study" element={<StudyPage />} />
+                <Route path="quizzes" element={<QuizzesPage />} />
+                <Route path="quizzes/:quizId" element={<QuizDetailPage />} />
+                <Route
+                  path="quizzes/:quizId/solve"
+                  element={<SolvePage />}
+                />
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

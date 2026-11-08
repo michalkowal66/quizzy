@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { to: "/", label: "Dashboard", end: true },
   { to: "/decks", label: "Decks", end: false },
+  { to: "/quizzes", label: "Quizzes", end: false },
 ];
 
 export function AppLayout() {
