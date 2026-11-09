@@ -1,0 +1,2298 @@
+{
+  "x-generator": "NSwag v14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))",
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Quizzy API",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8081"
+    }
+  ],
+  "paths": {
+    "/study/log": {
+      "post": {
+        "tags": [
+          "Study"
+        ],
+        "summary": "Records that the current user studied today (e.g. after reviewing a deck).",
+        "operationId": "QuizzyApiFeaturesStudyLogStudyEndpoint",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/quizzes": {
+      "post": {
+        "tags": [
+          "Quizzes"
+        ],
+        "operationId": "QuizzyApiFeaturesQuizzesCreateQuizEndpoint",
+        "requestBody": {
+          "x-name": "CreateQuizRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizzyApiFeaturesQuizzesCreateQuizRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationQuizzesQuizDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastEndpointsErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Quizzes"
+        ],
+        "operationId": "QuizzyApiFeaturesQuizzesListQuizzesEndpoint",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "name": "folderId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationCommonPagedResultOfQuizDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/quizzes/{id}": {
+      "get": {
+        "tags": [
+          "Quizzes"
+        ],
+        "operationId": "QuizzyApiFeaturesQuizzesGetQuizEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationQuizzesQuizDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Quizzes"
+        ],
+        "operationId": "QuizzyApiFeaturesQuizzesUpdateQuizEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "UpdateQuizRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizzyApiFeaturesQuizzesUpdateQuizRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationQuizzesQuizDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastEndpointsErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Quizzes"
+        ],
+        "operationId": "QuizzyApiFeaturesQuizzesDeleteQuizEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/quizzes/{quizId}/questions": {
+      "post": {
+        "tags": [
+          "Quizzes"
+        ],
+        "operationId": "QuizzyApiFeaturesQuestionsCreateQuestionEndpoint",
+        "parameters": [
+          {
+            "name": "quizId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "CreateQuestionRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizzyApiFeaturesQuestionsCreateQuestionRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationQuestionsQuestionDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastEndpointsErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Quizzes"
+        ],
+        "operationId": "QuizzyApiFeaturesQuestionsListQuestionsEndpoint",
+        "parameters": [
+          {
+            "name": "quizId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuizzyApplicationQuestionsQuestionDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/quizzes/{quizId}/questions/{id}": {
+      "put": {
+        "tags": [
+          "Quizzes"
+        ],
+        "operationId": "QuizzyApiFeaturesQuestionsUpdateQuestionEndpoint",
+        "parameters": [
+          {
+            "name": "quizId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "UpdateQuestionRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizzyApiFeaturesQuestionsUpdateQuestionRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationQuestionsQuestionDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastEndpointsErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Quizzes"
+        ],
+        "operationId": "QuizzyApiFeaturesQuestionsDeleteQuestionEndpoint",
+        "parameters": [
+          {
+            "name": "quizId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": [
+          "Me"
+        ],
+        "operationId": "QuizzyApiFeaturesProfileGetProfileEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationUsersProfileDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Me"
+        ],
+        "operationId": "QuizzyApiFeaturesProfileUpdateProfileEndpoint",
+        "requestBody": {
+          "x-name": "UpdateProfileRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizzyApiFeaturesProfileUpdateProfileRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationUsersProfileDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastEndpointsErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/folders": {
+      "post": {
+        "tags": [
+          "Folders"
+        ],
+        "operationId": "QuizzyApiFeaturesFoldersCreateFolderEndpoint",
+        "requestBody": {
+          "x-name": "CreateFolderRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizzyApiFeaturesFoldersCreateFolderRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationFoldersFolderDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastEndpointsErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Folders"
+        ],
+        "operationId": "QuizzyApiFeaturesFoldersListFoldersEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuizzyApplicationFoldersFolderDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/folders/{id}": {
+      "get": {
+        "tags": [
+          "Folders"
+        ],
+        "operationId": "QuizzyApiFeaturesFoldersGetFolderEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationFoldersFolderDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Folders"
+        ],
+        "operationId": "QuizzyApiFeaturesFoldersRenameFolderEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "RenameFolderRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizzyApiFeaturesFoldersRenameFolderRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationFoldersFolderDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastEndpointsErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Folders"
+        ],
+        "operationId": "QuizzyApiFeaturesFoldersDeleteFolderEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/decks/{deckId}/flashcards": {
+      "post": {
+        "tags": [
+          "Decks"
+        ],
+        "operationId": "QuizzyApiFeaturesFlashcardsCreateFlashcardEndpoint",
+        "parameters": [
+          {
+            "name": "deckId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "CreateFlashcardRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizzyApiFeaturesFlashcardsCreateFlashcardRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationFlashcardsFlashcardDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastEndpointsErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Decks"
+        ],
+        "operationId": "QuizzyApiFeaturesFlashcardsListFlashcardsEndpoint",
+        "parameters": [
+          {
+            "name": "deckId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuizzyApplicationFlashcardsFlashcardDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/decks/{deckId}/flashcards/{id}": {
+      "put": {
+        "tags": [
+          "Decks"
+        ],
+        "operationId": "QuizzyApiFeaturesFlashcardsUpdateFlashcardEndpoint",
+        "parameters": [
+          {
+            "name": "deckId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "UpdateFlashcardRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizzyApiFeaturesFlashcardsUpdateFlashcardRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationFlashcardsFlashcardDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastEndpointsErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Decks"
+        ],
+        "operationId": "QuizzyApiFeaturesFlashcardsDeleteFlashcardEndpoint",
+        "parameters": [
+          {
+            "name": "deckId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/decks": {
+      "post": {
+        "tags": [
+          "Decks"
+        ],
+        "operationId": "QuizzyApiFeaturesDecksCreateDeckEndpoint",
+        "requestBody": {
+          "x-name": "CreateDeckRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizzyApiFeaturesDecksCreateDeckRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationDecksDeckDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastEndpointsErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Decks"
+        ],
+        "operationId": "QuizzyApiFeaturesDecksListDecksEndpoint",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "name": "folderId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationCommonPagedResultOfDeckDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/decks/{id}": {
+      "get": {
+        "tags": [
+          "Decks"
+        ],
+        "operationId": "QuizzyApiFeaturesDecksGetDeckEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationDecksDeckDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Decks"
+        ],
+        "operationId": "QuizzyApiFeaturesDecksUpdateDeckEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "UpdateDeckRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizzyApiFeaturesDecksUpdateDeckRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationDecksDeckDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastEndpointsErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Decks"
+        ],
+        "operationId": "QuizzyApiFeaturesDecksDeleteDeckEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "operationId": "QuizzyApiFeaturesDashboardDashboardEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationDashboardDashboardDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "QuizzyApiFeaturesAuthRegisterEndpoint",
+        "requestBody": {
+          "x-name": "RegisterRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizzyApiFeaturesAuthRegisterRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationAuthAuthResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastEndpointsErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "QuizzyApiFeaturesAuthLoginEndpoint",
+        "requestBody": {
+          "x-name": "LoginRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizzyApiFeaturesAuthLoginRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationAuthAuthResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastEndpointsErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quizzes/{quizId}/attempts": {
+      "post": {
+        "tags": [
+          "Quizzes"
+        ],
+        "operationId": "QuizzyApiFeaturesAttemptsSubmitAttemptEndpoint",
+        "parameters": [
+          {
+            "name": "quizId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "SubmitAttemptRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizzyApiFeaturesAttemptsSubmitAttemptRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizzyApplicationAttemptsAttemptResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastEndpointsErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Quizzes"
+        ],
+        "operationId": "QuizzyApiFeaturesAttemptsListAttemptsEndpoint",
+        "parameters": [
+          {
+            "name": "quizId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuizzyApplicationAttemptsAttemptSummaryDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "QuizzyApiFeaturesAdminListUsersEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuizzyApplicationUsersUserSummaryDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": [
+              "Admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "GetHealth",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "QuizzyApplicationQuizzesQuizDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "folderId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "questionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "QuizzyApiFeaturesQuizzesCreateQuizRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 0,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 0,
+            "nullable": true
+          },
+          "folderId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          }
+        }
+      },
+      "FastEndpointsErrorResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "format": "int32",
+            "default": 400
+          },
+          "message": {
+            "type": "string",
+            "default": "One or more errors occurred!"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "QuizzyApplicationCommonPagedResultOfQuizDto": {
+        "type": "object",
+        "description": "A single page of results together with paging metadata.",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuizzyApplicationQuizzesQuizDto"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "QuizzyApiFeaturesQuizzesListQuizzesRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "QuizzyApiFeaturesQuizzesUpdateQuizRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 0,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 0,
+            "nullable": true
+          },
+          "folderId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          }
+        }
+      },
+      "QuizzyApplicationQuestionsQuestionDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "quizId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "text": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/QuizzyDomainEnumsQuestionType"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuizzyApplicationQuestionsAnswerOptionDto"
+            }
+          }
+        }
+      },
+      "QuizzyDomainEnumsQuestionType": {
+        "type": "string",
+        "description": "Determines how a question is answered and scored.",
+        "x-enumNames": [
+          "SingleChoice",
+          "MultipleChoice",
+          "TrueFalse"
+        ],
+        "enum": [
+          "SingleChoice",
+          "MultipleChoice",
+          "TrueFalse"
+        ]
+      },
+      "QuizzyApplicationQuestionsAnswerOptionDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "text": {
+            "type": "string"
+          },
+          "isCorrect": {
+            "type": "boolean"
+          }
+        }
+      },
+      "QuizzyApiFeaturesQuestionsCreateQuestionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "text",
+          "options"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 0,
+            "nullable": false
+          },
+          "type": {
+            "$ref": "#/components/schemas/QuizzyDomainEnumsQuestionType"
+          },
+          "options": {
+            "type": "array",
+            "minLength": 1,
+            "nullable": false,
+            "items": {
+              "$ref": "#/components/schemas/QuizzyApiFeaturesQuestionsOptionRequest"
+            }
+          }
+        }
+      },
+      "QuizzyApiFeaturesQuestionsOptionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "isCorrect": {
+            "type": "boolean"
+          }
+        }
+      },
+      "QuizzyApiFeaturesQuestionsUpdateQuestionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "text",
+          "options"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 0,
+            "nullable": false
+          },
+          "type": {
+            "$ref": "#/components/schemas/QuizzyDomainEnumsQuestionType"
+          },
+          "options": {
+            "type": "array",
+            "minLength": 1,
+            "nullable": false,
+            "items": {
+              "$ref": "#/components/schemas/QuizzyApiFeaturesQuestionsOptionRequest"
+            }
+          }
+        }
+      },
+      "QuizzyApplicationUsersProfileDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "QuizzyApiFeaturesProfileUpdateProfileRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "displayName"
+        ],
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0,
+            "nullable": false
+          }
+        }
+      },
+      "QuizzyApplicationFoldersFolderDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "deckCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "QuizzyApiFeaturesFoldersCreateFolderRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0,
+            "nullable": false
+          }
+        }
+      },
+      "QuizzyApiFeaturesFoldersRenameFolderRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0,
+            "nullable": false
+          }
+        }
+      },
+      "QuizzyApplicationFlashcardsFlashcardDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "deckId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "front": {
+            "type": "string"
+          },
+          "back": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "QuizzyApiFeaturesFlashcardsCreateFlashcardRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "front",
+          "back"
+        ],
+        "properties": {
+          "front": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 0,
+            "nullable": false
+          },
+          "back": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 0,
+            "nullable": false
+          }
+        }
+      },
+      "QuizzyApiFeaturesFlashcardsUpdateFlashcardRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "front",
+          "back"
+        ],
+        "properties": {
+          "front": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 0,
+            "nullable": false
+          },
+          "back": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 0,
+            "nullable": false
+          }
+        }
+      },
+      "QuizzyApplicationDecksDeckDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "folderId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "flashcardCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "QuizzyApiFeaturesDecksCreateDeckRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 0,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 0,
+            "nullable": true
+          },
+          "folderId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          }
+        }
+      },
+      "QuizzyApplicationCommonPagedResultOfDeckDto": {
+        "type": "object",
+        "description": "A single page of results together with paging metadata.",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuizzyApplicationDecksDeckDto"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "QuizzyApiFeaturesDecksListDecksRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "QuizzyApiFeaturesDecksUpdateDeckRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 0,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 0,
+            "nullable": true
+          },
+          "folderId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          }
+        }
+      },
+      "QuizzyApplicationDashboardDashboardDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "currentStreak": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "longestStreak": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "studiedToday": {
+            "type": "boolean"
+          },
+          "lastActivity": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "deckCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "flashcardCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "quizCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "attemptCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "QuizzyApplicationAuthAuthResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "QuizzyApiFeaturesAuthRegisterRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "email",
+          "displayName",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 256,
+            "minLength": 0,
+            "pattern": "^[^@]+@[^@]+$",
+            "nullable": false
+          },
+          "displayName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0,
+            "nullable": false
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 8,
+            "nullable": false
+          }
+        }
+      },
+      "QuizzyApiFeaturesAuthLoginRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "minLength": 1,
+            "nullable": false
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "nullable": false
+          }
+        }
+      },
+      "QuizzyApplicationAttemptsAttemptResultDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "quizId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "score": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuizzyApplicationAttemptsAttemptAnswerResultDto"
+            }
+          }
+        }
+      },
+      "QuizzyApplicationAttemptsAttemptAnswerResultDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "isCorrect": {
+            "type": "boolean"
+          },
+          "selectedOptionIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          },
+          "correctOptionIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        }
+      },
+      "QuizzyApiFeaturesAttemptsSubmitAttemptRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "answers"
+        ],
+        "properties": {
+          "answers": {
+            "type": "array",
+            "minLength": 1,
+            "nullable": false,
+            "items": {
+              "$ref": "#/components/schemas/QuizzyApiFeaturesAttemptsAnswerRequest"
+            }
+          }
+        }
+      },
+      "QuizzyApiFeaturesAttemptsAnswerRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "selectedOptionIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        }
+      },
+      "QuizzyApplicationAttemptsAttemptSummaryDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "quizId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "score": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "QuizzyApplicationUsersUserSummaryDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "JWTBearerAuth": {
+        "type": "http",
+        "description": "Enter a JWT token to authorize the requests...",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
