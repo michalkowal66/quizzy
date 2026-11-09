@@ -1,4 +1,5 @@
-# Local development infrastructure: database and message broker.
+# Full application stack: database, message broker, API and web client.
+# Run `docker compose up --build` and open the web client on http://localhost:8080.
 services:
   postgres:
     image: postgres:17-alpine
@@ -35,6 +36,41 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: src/Quizzy.Api/Dockerfile
+    container_name: quizzy-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-quizzy};Username=${POSTGRES_USER:-quizzy};Password=${POSTGRES_PASSWORD:-quizzy}"
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: ${RABBITMQ_USER:-quizzy}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-quizzy}
+      Jwt__SigningKey: ${Jwt__SigningKey:?set Jwt__SigningKey in your .env file}
+      Seed__AdminEmail: ${Seed__AdminEmail:-admin@quizzy.local}
+      Seed__AdminPassword: ${Seed__AdminPassword:-}
+    ports:
+      - "${API_PORT:-8081}:8080"
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: quizzy-web
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-8080}:80"
 
 volumes:
   postgres-data:

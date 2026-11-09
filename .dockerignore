@@ -1,0 +1,17 @@
+# Keep the backend build context small and reproducible.
+**/bin/
+**/obj/
+.git/
+.github/
+.vs/
+.vscode/
+.idea/
+
+# The frontend has its own build context and Dockerfile.
+frontend/
+
+# Tests are not needed to publish the API.
+tests/
+
+# Local environment
+.env
