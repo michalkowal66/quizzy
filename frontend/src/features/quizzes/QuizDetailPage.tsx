@@ -132,30 +132,33 @@ export function QuizDetailPage() {
             <p className="mt-1 text-xs text-muted-foreground">In {folderName}</p>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-3">
           {questions.length > 0 && (
             <Link
               to={`/quizzes/${quizId}/solve`}
-              className={buttonVariants({ size: "sm" })}
+              className={buttonVariants()}
             >
               Solve
             </Link>
           )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setEditQuizOpen(true)}
-          >
-            Edit
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleDeleteQuiz}
-            disabled={deleteQuiz.isPending}
-          >
-            Delete
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setEditQuizOpen(true)}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+              onClick={handleDeleteQuiz}
+              disabled={deleteQuiz.isPending}
+            >
+              Delete
+            </Button>
+          </div>
         </div>
       </div>
 
