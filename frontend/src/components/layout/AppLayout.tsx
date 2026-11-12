@@ -8,6 +8,7 @@ const navItems = [
   { to: "/", label: "Dashboard", end: true },
   { to: "/decks", label: "Decks", end: false },
   { to: "/quizzes", label: "Quizzes", end: false },
+  { to: "/folders", label: "Folders", end: false },
 ];
 
 export function AppLayout() {

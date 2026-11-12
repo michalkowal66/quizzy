@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getErrorMessage } from "@/lib/problem";
+import { useFolders } from "@/features/folders/hooks";
 import { DeckFormDialog, type DeckFormValues } from "./DeckFormDialog";
 import {
   FlashcardFormDialog,
@@ -24,6 +25,7 @@ export function DeckDetailPage() {
   const navigate = useNavigate();
 
   const deckQuery = useDeck(deckId);
+  const foldersQuery = useFolders();
   const flashcardsQuery = useFlashcards(deckId);
   const updateDeck = useUpdateDeck(deckId);
   const deleteDeck = useDeleteDeck();
@@ -37,7 +39,10 @@ export function DeckDetailPage() {
   const deck = deckQuery.data;
 
   const handleUpdateDeck = (values: DeckFormValues) => {
-    updateDeck.mutate(values, { onSuccess: () => setEditDeckOpen(false) });
+    updateDeck.mutate(
+      { ...values, folderId: values.folderId || null },
+      { onSuccess: () => setEditDeckOpen(false) },
+    );
   };
 
   const handleDeleteDeck = () => {
@@ -86,6 +91,10 @@ export function DeckDetailPage() {
   }
 
   const flashcards = flashcardsQuery.data ?? [];
+  const folderName = deck.folderId
+    ? (foldersQuery.data ?? []).find((folder) => folder.id === deck.folderId)
+        ?.name
+    : undefined;
 
   return (
     <div className="flex flex-col gap-6">
@@ -101,6 +110,9 @@ export function DeckDetailPage() {
           <h1 className="text-2xl font-semibold">{deck.title}</h1>
           {deck.description && (
             <p className="text-muted-foreground">{deck.description}</p>
+          )}
+          {folderName && (
+            <p className="mt-1 text-xs text-muted-foreground">In {folderName}</p>
           )}
         </div>
         <div className="flex gap-2">
@@ -151,7 +163,7 @@ export function DeckDetailPage() {
         <div className="flex flex-col gap-3">
           {flashcards.map((card) => (
             <Card key={card.id}>
-              <CardContent className="flex items-start justify-between gap-4 p-4">
+              <CardContent className="flex items-center justify-between gap-4 p-4">
                 <div className="grid flex-1 gap-1 sm:grid-cols-2">
                   <p className="text-sm">{card.front}</p>
                   <p className="text-sm text-muted-foreground">{card.back}</p>
@@ -187,6 +199,7 @@ export function DeckDetailPage() {
           defaultValues={{
             title: deck.title,
             description: deck.description ?? "",
+            folderId: deck.folderId ?? "",
           }}
           pending={updateDeck.isPending}
           errorMessage={

@@ -6,6 +6,7 @@ export interface ListDecksParams {
   page?: number;
   pageSize?: number;
   search?: string;
+  folderId?: string;
 }
 
 export async function listDecks(

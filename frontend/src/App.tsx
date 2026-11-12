@@ -8,6 +8,7 @@ import { RegisterPage } from "@/features/auth/RegisterPage";
 import { DashboardPage } from "@/features/dashboard/DashboardPage";
 import { DeckDetailPage } from "@/features/decks/DeckDetailPage";
 import { DecksPage } from "@/features/decks/DecksPage";
+import { FoldersPage } from "@/features/folders/FoldersPage";
 import { QuizDetailPage } from "@/features/quizzes/QuizDetailPage";
 import { QuizzesPage } from "@/features/quizzes/QuizzesPage";
 import { SolvePage } from "@/features/quizzes/SolvePage";
@@ -34,6 +35,7 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
               <Route element={<AppLayout />}>
                 <Route index element={<DashboardPage />} />
+                <Route path="folders" element={<FoldersPage />} />
                 <Route path="decks" element={<DecksPage />} />
                 <Route path="decks/:deckId" element={<DeckDetailPage />} />
                 <Route path="decks/:deckId/study" element={<StudyPage />} />

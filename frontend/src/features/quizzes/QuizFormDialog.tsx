@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useFolders } from "@/features/folders/hooks";
 
 const schema = z.object({
   title: z
@@ -19,6 +21,7 @@ const schema = z.object({
     .trim()
     .max(1000, "Description is too long.")
     .optional(),
+  folderId: z.string().optional(),
 });
 
 export type QuizFormValues = z.infer<typeof schema>;
@@ -50,6 +53,9 @@ export function QuizFormDialog({
     formState: { errors },
   } = useForm<QuizFormValues>({ resolver: zodResolver(schema), defaultValues });
 
+  const foldersQuery = useFolders();
+  const folders = foldersQuery.data ?? [];
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange} title={title}>
       <form
@@ -72,6 +78,17 @@ export function QuizFormDialog({
               {errors.description.message}
             </p>
           )}
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="quiz-folder">Folder</Label>
+          <Select id="quiz-folder" {...register("folderId")}>
+            <option value="">No folder</option>
+            {folders.map((folder) => (
+              <option key={folder.id} value={folder.id}>
+                {folder.name}
+              </option>
+            ))}
+          </Select>
         </div>
         {errorMessage && (
           <p className="text-sm text-destructive">{errorMessage}</p>

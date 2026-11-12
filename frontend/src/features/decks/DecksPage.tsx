@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { useFolders } from "@/features/folders/hooks";
 import { getErrorMessage } from "@/lib/problem";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
 import { DeckFormDialog, type DeckFormValues } from "./DeckFormDialog";
@@ -13,24 +15,37 @@ const PAGE_SIZE = 12;
 
 export function DecksPage() {
   const [search, setSearch] = useState("");
+  const [folderId, setFolderId] = useState("");
   const [page, setPage] = useState(1);
   const [createOpen, setCreateOpen] = useState(false);
 
   const debouncedSearch = useDebouncedValue(search);
+  const foldersQuery = useFolders();
   const decksQuery = useDecks({
     page,
     pageSize: PAGE_SIZE,
     search: debouncedSearch || undefined,
+    folderId: folderId || undefined,
   });
   const createDeck = useCreateDeck();
+
+  const folders = foldersQuery.data ?? [];
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
     setPage(1);
   };
 
+  const handleFolderChange = (value: string) => {
+    setFolderId(value);
+    setPage(1);
+  };
+
   const handleCreate = (values: DeckFormValues) => {
-    createDeck.mutate(values, { onSuccess: () => setCreateOpen(false) });
+    createDeck.mutate(
+      { ...values, folderId: values.folderId || null },
+      { onSuccess: () => setCreateOpen(false) },
+    );
   };
 
   const result = decksQuery.data;
@@ -48,12 +63,29 @@ export function DecksPage() {
         <Button onClick={() => setCreateOpen(true)}>New deck</Button>
       </div>
 
-      <Input
-        placeholder="Search decks…"
-        value={search}
-        onChange={(event) => handleSearchChange(event.target.value)}
-        className="max-w-sm"
-      />
+      <div className="flex flex-wrap gap-3">
+        <Input
+          placeholder="Search decks…"
+          value={search}
+          onChange={(event) => handleSearchChange(event.target.value)}
+          className="max-w-sm flex-1"
+        />
+        {folders.length > 0 && (
+          <Select
+            aria-label="Filter by folder"
+            value={folderId}
+            onChange={(event) => handleFolderChange(event.target.value)}
+            className="w-full sm:w-52"
+          >
+            <option value="">All folders</option>
+            {folders.map((folder) => (
+              <option key={folder.id} value={folder.id}>
+                {folder.name}
+              </option>
+            ))}
+          </Select>
+        )}
+      </div>
 
       {decksQuery.isPending ? (
         <p className="text-muted-foreground">Loading decks…</p>
@@ -63,7 +95,9 @@ export function DecksPage() {
         <p className="text-muted-foreground">
           {debouncedSearch
             ? "No decks match your search."
-            : "No decks yet. Create your first one."}
+            : folderId
+              ? "No decks in this folder."
+              : "No decks yet. Create your first one."}
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -118,7 +152,7 @@ export function DecksPage() {
           onOpenChange={setCreateOpen}
           title="New deck"
           submitLabel="Create"
-          defaultValues={{ title: "", description: "" }}
+          defaultValues={{ title: "", description: "", folderId: "" }}
           pending={createDeck.isPending}
           errorMessage={
             createDeck.isError ? getErrorMessage(createDeck.error) : null

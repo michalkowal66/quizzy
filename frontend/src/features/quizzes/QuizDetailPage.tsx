@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getErrorMessage } from "@/lib/problem";
+import { useFolders } from "@/features/folders/hooks";
 import { QuestionFormDialog } from "./QuestionFormDialog";
 import { QuizFormDialog, type QuizFormValues } from "./QuizFormDialog";
 import {
@@ -39,6 +40,7 @@ export function QuizDetailPage() {
   const navigate = useNavigate();
 
   const quizQuery = useQuiz(quizId);
+  const foldersQuery = useFolders();
   const questionsQuery = useQuestions(quizId);
   const attemptsQuery = useAttempts(quizId);
   const updateQuiz = useUpdateQuiz(quizId);
@@ -53,7 +55,10 @@ export function QuizDetailPage() {
   const quiz = quizQuery.data;
 
   const handleUpdateQuiz = (values: QuizFormValues) => {
-    updateQuiz.mutate(values, { onSuccess: () => setEditQuizOpen(false) });
+    updateQuiz.mutate(
+      { ...values, folderId: values.folderId || null },
+      { onSuccess: () => setEditQuizOpen(false) },
+    );
   };
 
   const handleDeleteQuiz = () => {
@@ -103,6 +108,10 @@ export function QuizDetailPage() {
 
   const questions = questionsQuery.data ?? [];
   const attempts = attemptsQuery.data ?? [];
+  const folderName = quiz.folderId
+    ? (foldersQuery.data ?? []).find((folder) => folder.id === quiz.folderId)
+        ?.name
+    : undefined;
 
   return (
     <div className="flex flex-col gap-6">
@@ -118,6 +127,9 @@ export function QuizDetailPage() {
           <h1 className="text-2xl font-semibold">{quiz.title}</h1>
           {quiz.description && (
             <p className="text-muted-foreground">{quiz.description}</p>
+          )}
+          {folderName && (
+            <p className="mt-1 text-xs text-muted-foreground">In {folderName}</p>
           )}
         </div>
         <div className="flex gap-2">
@@ -249,6 +261,7 @@ export function QuizDetailPage() {
           defaultValues={{
             title: quiz.title,
             description: quiz.description ?? "",
+            folderId: quiz.folderId ?? "",
           }}
           pending={updateQuiz.isPending}
           errorMessage={

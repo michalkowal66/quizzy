@@ -21,14 +21,20 @@ public class FolderService : IFolderService
         return await _db.Folders
             .Where(f => f.OwnerId == _currentUser.UserId)
             .OrderBy(f => f.Name)
-            .Select(f => new FolderDto(f.Id, f.Name, f.Decks.Count, f.CreatedAt))
+            .Select(f => new FolderDto(
+                f.Id,
+                f.Name,
+                f.Decks.Count,
+                _db.Quizzes.Count(q => q.FolderId == f.Id),
+                f.CreatedAt))
             .ToListAsync(cancellationToken);
     }
 
     public async Task<FolderDto> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var folder = await FindOwnedAsync(id, cancellationToken);
-        return new FolderDto(folder.Id, folder.Name, folder.Decks.Count, folder.CreatedAt);
+        var quizCount = await _db.Quizzes.CountAsync(q => q.FolderId == folder.Id, cancellationToken);
+        return new FolderDto(folder.Id, folder.Name, folder.Decks.Count, quizCount, folder.CreatedAt);
     }
 
     public async Task<FolderDto> CreateAsync(string name, CancellationToken cancellationToken = default)
@@ -44,7 +50,7 @@ public class FolderService : IFolderService
         _db.Folders.Add(folder);
         await _db.SaveChangesAsync(cancellationToken);
 
-        return new FolderDto(folder.Id, folder.Name, 0, folder.CreatedAt);
+        return new FolderDto(folder.Id, folder.Name, 0, 0, folder.CreatedAt);
     }
 
     public async Task<FolderDto> RenameAsync(Guid id, string name, CancellationToken cancellationToken = default)
@@ -55,7 +61,8 @@ public class FolderService : IFolderService
         folder.Name = name.Trim();
         await _db.SaveChangesAsync(cancellationToken);
 
-        return new FolderDto(folder.Id, folder.Name, folder.Decks.Count, folder.CreatedAt);
+        var quizCount = await _db.Quizzes.CountAsync(q => q.FolderId == folder.Id, cancellationToken);
+        return new FolderDto(folder.Id, folder.Name, folder.Decks.Count, quizCount, folder.CreatedAt);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)

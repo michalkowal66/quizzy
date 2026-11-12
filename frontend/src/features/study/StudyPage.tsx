@@ -6,6 +6,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useDeck, useFlashcards } from "@/features/decks/hooks";
 import { getErrorMessage } from "@/lib/problem";
+import { cn } from "@/lib/utils";
 import { logStudy } from "./api";
 
 export function StudyPage() {
@@ -109,14 +110,31 @@ export function StudyPage() {
         </span>
       </div>
 
-      <Card className="min-h-60">
-        <CardContent className="flex min-h-60 flex-col items-center justify-center gap-3 p-8 text-center">
-          <span className="text-xs uppercase tracking-wide text-muted-foreground">
-            {showBack ? "Answer" : "Question"}
-          </span>
-          <p className="text-lg">{showBack ? card.back : card.front}</p>
-        </CardContent>
-      </Card>
+      <div className="[perspective:1000px]">
+        <div
+          className={cn(
+            "relative min-h-60 transition-transform duration-500 transform-3d motion-reduce:transition-none",
+            showBack && "rotate-y-180",
+          )}
+        >
+          <Card className="absolute inset-0 backface-hidden">
+            <CardContent className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
+              <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                Question
+              </span>
+              <p className="text-lg">{card.front}</p>
+            </CardContent>
+          </Card>
+          <Card className="absolute inset-0 rotate-y-180 backface-hidden">
+            <CardContent className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
+              <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                Answer
+              </span>
+              <p className="text-lg">{card.back}</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       <div className="flex justify-center gap-2">
         {!showBack ? (

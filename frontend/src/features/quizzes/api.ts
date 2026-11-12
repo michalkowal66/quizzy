@@ -14,6 +14,7 @@ export interface ListQuizzesParams {
   page?: number;
   pageSize?: number;
   search?: string;
+  folderId?: string;
 }
 
 export async function listQuizzes(

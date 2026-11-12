@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { useFolders } from "@/features/folders/hooks";
 import { getErrorMessage } from "@/lib/problem";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
 import { QuizFormDialog, type QuizFormValues } from "./QuizFormDialog";
@@ -13,24 +15,37 @@ const PAGE_SIZE = 12;
 
 export function QuizzesPage() {
   const [search, setSearch] = useState("");
+  const [folderId, setFolderId] = useState("");
   const [page, setPage] = useState(1);
   const [createOpen, setCreateOpen] = useState(false);
 
   const debouncedSearch = useDebouncedValue(search);
+  const foldersQuery = useFolders();
   const quizzesQuery = useQuizzes({
     page,
     pageSize: PAGE_SIZE,
     search: debouncedSearch || undefined,
+    folderId: folderId || undefined,
   });
   const createQuiz = useCreateQuiz();
+
+  const folders = foldersQuery.data ?? [];
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
     setPage(1);
   };
 
+  const handleFolderChange = (value: string) => {
+    setFolderId(value);
+    setPage(1);
+  };
+
   const handleCreate = (values: QuizFormValues) => {
-    createQuiz.mutate(values, { onSuccess: () => setCreateOpen(false) });
+    createQuiz.mutate(
+      { ...values, folderId: values.folderId || null },
+      { onSuccess: () => setCreateOpen(false) },
+    );
   };
 
   const result = quizzesQuery.data;
@@ -48,12 +63,29 @@ export function QuizzesPage() {
         <Button onClick={() => setCreateOpen(true)}>New quiz</Button>
       </div>
 
-      <Input
-        placeholder="Search quizzes…"
-        value={search}
-        onChange={(event) => handleSearchChange(event.target.value)}
-        className="max-w-sm"
-      />
+      <div className="flex flex-wrap gap-3">
+        <Input
+          placeholder="Search quizzes…"
+          value={search}
+          onChange={(event) => handleSearchChange(event.target.value)}
+          className="max-w-sm flex-1"
+        />
+        {folders.length > 0 && (
+          <Select
+            aria-label="Filter by folder"
+            value={folderId}
+            onChange={(event) => handleFolderChange(event.target.value)}
+            className="w-full sm:w-52"
+          >
+            <option value="">All folders</option>
+            {folders.map((folder) => (
+              <option key={folder.id} value={folder.id}>
+                {folder.name}
+              </option>
+            ))}
+          </Select>
+        )}
+      </div>
 
       {quizzesQuery.isPending ? (
         <p className="text-muted-foreground">Loading quizzes…</p>
@@ -65,7 +97,9 @@ export function QuizzesPage() {
         <p className="text-muted-foreground">
           {debouncedSearch
             ? "No quizzes match your search."
-            : "No quizzes yet. Create your first one."}
+            : folderId
+              ? "No quizzes in this folder."
+              : "No quizzes yet. Create your first one."}
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -120,7 +154,7 @@ export function QuizzesPage() {
           onOpenChange={setCreateOpen}
           title="New quiz"
           submitLabel="Create"
-          defaultValues={{ title: "", description: "" }}
+          defaultValues={{ title: "", description: "", folderId: "" }}
           pending={createQuiz.isPending}
           errorMessage={
             createQuiz.isError ? getErrorMessage(createQuiz.error) : null
