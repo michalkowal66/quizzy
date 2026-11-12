@@ -67,14 +67,14 @@ once the containers report healthy. Published ports can be changed with `WEB_POR
 Prerequisites: .NET 10 SDK, Docker, Node.js.
 
 ```bash
-# 1. Start the backing services
-cp .env.example .env            # then edit values
-docker compose up -d postgres rabbitmq
+# 1. Start the database. RabbitMQ is optional — see the note below.
+cp .env.example .env
+docker compose up -d postgres
 
 # 2. Provide the local JWT signing key
 dotnet user-secrets set "Jwt:SigningKey" "<a-long-random-secret>" --project src/Quizzy.Api
 
-# 3. Run the API (http://localhost:5289)
+# 3. Run the API (http://localhost:5289); use `dotnet watch` for hot reload
 dotnet run --project src/Quizzy.Api
 
 # 4. Run the web client (http://localhost:5173)
@@ -84,7 +84,8 @@ npm run dev
 ```
 
 When no broker is configured (`RabbitMq:Host` unset), the message bus runs
-in-process, so the API and the test suite work without RabbitMQ.
+in-process, so the API and the test suite work without RabbitMQ. Start it with
+`docker compose up -d rabbitmq` only when exercising the asynchronous flow.
 
 ## Configuration
 
