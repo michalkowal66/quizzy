@@ -16,10 +16,12 @@ export function StudyPage() {
   const logStudyMutation = useMutation({ mutationFn: logStudy });
 
   const [index, setIndex] = useState(0);
-  const [showBack, setShowBack] = useState(false);
+  const [flipped, setFlipped] = useState(false);
+  // The furthest card whose answer has been revealed; gates moving forward.
+  const [maxRevealed, setMaxRevealed] = useState(-1);
   const [finished, setFinished] = useState(false);
 
-  // Record study activity once, when the learner reaches the end of the deck.
+  // Record study activity once, when the learner finishes the deck.
   const { mutate: recordStudy } = logStudyMutation;
   useEffect(() => {
     if (finished) {
@@ -60,17 +62,9 @@ export function StudyPage() {
 
   const restart = () => {
     setIndex(0);
-    setShowBack(false);
+    setFlipped(false);
+    setMaxRevealed(-1);
     setFinished(false);
-  };
-
-  const advance = () => {
-    if (index + 1 >= flashcards.length) {
-      setFinished(true);
-    } else {
-      setIndex((current) => current + 1);
-      setShowBack(false);
-    }
   };
 
   if (finished) {
@@ -95,6 +89,36 @@ export function StudyPage() {
   }
 
   const card = flashcards[index];
+  const isLast = index === flashcards.length - 1;
+  const currentRevealed = index <= maxRevealed;
+  const canGoBack = index > 0;
+  const canGoForward = currentRevealed;
+
+  const flip = () => {
+    setFlipped((previous) => {
+      const next = !previous;
+      if (next) {
+        setMaxRevealed((furthest) => Math.max(furthest, index));
+      }
+      return next;
+    });
+  };
+
+  const goTo = (nextIndex: number) => {
+    setIndex(nextIndex);
+    setFlipped(false);
+  };
+
+  const goNext = () => {
+    if (!canGoForward) {
+      return;
+    }
+    if (isLast) {
+      setFinished(true);
+    } else {
+      goTo(index + 1);
+    }
+  };
 
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-6">
@@ -110,11 +134,16 @@ export function StudyPage() {
         </span>
       </div>
 
-      <div className="[perspective:1000px]">
+      <button
+        type="button"
+        onClick={flip}
+        aria-label={flipped ? "Show the question" : "Show the answer"}
+        className="w-full rounded-xl text-left [perspective:1000px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
         <div
           className={cn(
             "relative min-h-60 transition-transform duration-500 transform-3d motion-reduce:transition-none",
-            showBack && "rotate-y-180",
+            flipped && "rotate-y-180",
           )}
         >
           <Card className="absolute inset-0 backface-hidden">
@@ -134,16 +163,22 @@ export function StudyPage() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </button>
 
-      <div className="flex justify-center gap-2">
-        {!showBack ? (
-          <Button onClick={() => setShowBack(true)}>Show answer</Button>
-        ) : (
-          <Button onClick={advance}>
-            {index + 1 >= flashcards.length ? "Finish" : "Next card"}
-          </Button>
-        )}
+      <div className="flex items-center justify-between gap-2">
+        <Button
+          variant="outline"
+          onClick={() => goTo(index - 1)}
+          disabled={!canGoBack}
+        >
+          Previous
+        </Button>
+        <Button variant={currentRevealed ? "outline" : "default"} onClick={flip}>
+          {flipped ? "Show question" : "Show answer"}
+        </Button>
+        <Button onClick={goNext} disabled={!canGoForward}>
+          {isLast ? "Finish" : "Next"}
+        </Button>
       </div>
     </div>
   );
