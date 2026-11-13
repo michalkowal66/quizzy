@@ -20,6 +20,8 @@ import {
 } from "./hooks";
 import type { Flashcard } from "./types";
 
+const PAGE_SIZE = 10;
+
 export function DeckDetailPage() {
   const { deckId = "" } = useParams();
   const navigate = useNavigate();
@@ -35,6 +37,7 @@ export function DeckDetailPage() {
   const [editDeckOpen, setEditDeckOpen] = useState(false);
   const [editingCard, setEditingCard] = useState<Flashcard | null>(null);
   const [cardDialogOpen, setCardDialogOpen] = useState(false);
+  const [page, setPage] = useState(1);
 
   const deck = deckQuery.data;
 
@@ -96,6 +99,13 @@ export function DeckDetailPage() {
         ?.name
     : undefined;
 
+  const totalPages = Math.max(1, Math.ceil(flashcards.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const visibleFlashcards = flashcards.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+
   return (
     <div className="flex flex-col gap-6">
       <Link
@@ -112,7 +122,9 @@ export function DeckDetailPage() {
             <p className="text-muted-foreground">{deck.description}</p>
           )}
           {folderName && (
-            <p className="mt-1 text-xs text-muted-foreground">In {folderName}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              In {folderName}
+            </p>
           )}
         </div>
         <div className="flex items-center gap-3">
@@ -160,34 +172,59 @@ export function DeckDetailPage() {
           No flashcards yet. Add your first one.
         </p>
       ) : (
-        <div className="flex flex-col gap-3">
-          {flashcards.map((card) => (
-            <Card key={card.id}>
-              <CardContent className="flex items-center justify-between gap-4 p-4">
-                <div className="grid flex-1 gap-1 sm:grid-cols-2">
-                  <p className="text-sm">{card.front}</p>
-                  <p className="text-sm text-muted-foreground">{card.back}</p>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => openEditCard(card)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteCard(card)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <>
+          <div className="flex flex-col gap-3">
+            {visibleFlashcards.map((card) => (
+              <Card key={card.id}>
+                <CardContent className="flex items-center justify-between gap-4 p-4">
+                  <div className="grid flex-1 gap-1 sm:grid-cols-2">
+                    <p className="text-sm">{card.front}</p>
+                    <p className="text-sm text-muted-foreground">{card.back}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openEditCard(card)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteCard(card)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage <= 1}
+                onClick={() => setPage(currentPage - 1)}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage >= totalPages}
+                onClick={() => setPage(currentPage + 1)}
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        </>
       )}
 
       {editDeckOpen && (

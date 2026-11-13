@@ -21,6 +21,7 @@ export function SolvePage() {
 
   const [selections, setSelections] = useState<Selections>({});
   const [result, setResult] = useState<AttemptResult | null>(null);
+  const [step, setStep] = useState(0);
 
   const toggleOption = (question: Question, optionId: string) => {
     setSelections((current) => {
@@ -81,6 +82,7 @@ export function SolvePage() {
   const restart = () => {
     setSelections({});
     setResult(null);
+    setStep(0);
   };
 
   if (result) {
@@ -162,6 +164,10 @@ export function SolvePage() {
     );
   }
 
+  const current = questions[step];
+  const selectedForCurrent = selections[current.id] ?? [];
+  const isLastStep = step === questions.length - 1;
+
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -176,41 +182,50 @@ export function SolvePage() {
         </span>
       </div>
 
-      <div className="flex flex-col gap-3">
-        {questions.map((question, index) => {
-          const selected = selections[question.id] ?? [];
-          return (
-            <Card key={question.id}>
-              <CardContent className="flex flex-col gap-3 p-4">
-                <p className="text-sm font-medium">
-                  {index + 1}. {question.text}
-                </p>
-                <div className="flex flex-col gap-2">
-                  {question.options.map((option) => (
-                    <label
-                      key={option.id}
-                      className="flex cursor-pointer items-center gap-2 text-sm"
-                    >
-                      <input
-                        type={
-                          question.type === "MultipleChoice"
-                            ? "checkbox"
-                            : "radio"
-                        }
-                        name={`question-${question.id}`}
-                        checked={selected.includes(option.id)}
-                        onChange={() => toggleOption(question, option.id)}
-                        className="size-4 shrink-0 accent-primary"
-                      />
-                      {option.text}
-                    </label>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+      <div className="flex flex-col gap-2">
+        <span className="text-sm text-muted-foreground">
+          Question {step + 1} of {questions.length}
+        </span>
+        <div
+          className="h-1.5 w-full overflow-hidden rounded-full bg-secondary"
+          role="progressbar"
+          aria-valuenow={step + 1}
+          aria-valuemin={1}
+          aria-valuemax={questions.length}
+        >
+          <div
+            className="h-full rounded-full bg-primary transition-all"
+            style={{ width: `${((step + 1) / questions.length) * 100}%` }}
+          />
+        </div>
       </div>
+
+      <Card>
+        <CardContent className="flex flex-col gap-3 p-4">
+          <p className="text-sm font-medium">
+            {step + 1}. {current.text}
+          </p>
+          <div className="flex flex-col gap-2">
+            {current.options.map((option) => (
+              <label
+                key={option.id}
+                className="flex cursor-pointer items-center gap-2 text-sm"
+              >
+                <input
+                  type={
+                    current.type === "MultipleChoice" ? "checkbox" : "radio"
+                  }
+                  name={`question-${current.id}`}
+                  checked={selectedForCurrent.includes(option.id)}
+                  onChange={() => toggleOption(current, option.id)}
+                  className="size-4 shrink-0 accent-primary"
+                />
+                {option.text}
+              </label>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {submitAttempt.isError && (
         <p className="text-sm text-destructive">
@@ -218,19 +233,33 @@ export function SolvePage() {
         </p>
       )}
 
-      <div className="flex items-center justify-between gap-4">
-        <span className="text-sm text-muted-foreground">
-          {answeredCount < questions.length
-            ? "Unanswered questions count as incorrect."
-            : "All questions answered."}
-        </span>
+      <div className="flex items-center justify-between gap-2">
         <Button
-          onClick={handleSubmit}
-          disabled={submitAttempt.isPending || answeredCount === 0}
+          variant="outline"
+          onClick={() => setStep((previous) => previous - 1)}
+          disabled={step === 0}
         >
-          {submitAttempt.isPending ? "Submitting…" : "Submit"}
+          Previous
         </Button>
+        {isLastStep ? (
+          <Button
+            onClick={handleSubmit}
+            disabled={submitAttempt.isPending || answeredCount === 0}
+          >
+            {submitAttempt.isPending ? "Submitting…" : "Submit"}
+          </Button>
+        ) : (
+          <Button onClick={() => setStep((previous) => previous + 1)}>
+            Next
+          </Button>
+        )}
       </div>
+
+      <p className="text-center text-xs text-muted-foreground">
+        {answeredCount < questions.length
+          ? "Unanswered questions count as incorrect."
+          : "All questions answered."}
+      </p>
     </div>
   );
 }

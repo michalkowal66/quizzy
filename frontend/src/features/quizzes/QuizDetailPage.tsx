@@ -16,11 +16,7 @@ import {
   useSaveQuestion,
   useUpdateQuiz,
 } from "./hooks";
-import {
-  questionTypeLabels,
-  type Question,
-  type QuestionInput,
-} from "./types";
+import { questionTypeLabels, type Question, type QuestionInput } from "./types";
 
 const emptyQuestion: QuestionInput = {
   text: "",
@@ -34,6 +30,8 @@ const emptyQuestion: QuestionInput = {
 function formatPercentage(value: number): string {
   return `${Math.round(value)}%`;
 }
+
+const PAGE_SIZE = 5;
 
 export function QuizDetailPage() {
   const { quizId = "" } = useParams();
@@ -51,6 +49,7 @@ export function QuizDetailPage() {
   const [editQuizOpen, setEditQuizOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [questionDialogOpen, setQuestionDialogOpen] = useState(false);
+  const [page, setPage] = useState(1);
 
   const quiz = quizQuery.data;
 
@@ -113,6 +112,13 @@ export function QuizDetailPage() {
         ?.name
     : undefined;
 
+  const totalPages = Math.max(1, Math.ceil(questions.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const visibleQuestions = questions.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+
   return (
     <div className="flex flex-col gap-6">
       <Link
@@ -129,15 +135,14 @@ export function QuizDetailPage() {
             <p className="text-muted-foreground">{quiz.description}</p>
           )}
           {folderName && (
-            <p className="mt-1 text-xs text-muted-foreground">In {folderName}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              In {folderName}
+            </p>
           )}
         </div>
         <div className="flex items-center gap-3">
           {questions.length > 0 && (
-            <Link
-              to={`/quizzes/${quizId}/solve`}
-              className={buttonVariants()}
-            >
+            <Link to={`/quizzes/${quizId}/solve`} className={buttonVariants()}>
               Solve
             </Link>
           )}
@@ -180,55 +185,80 @@ export function QuizDetailPage() {
           No questions yet. Add your first one.
         </p>
       ) : (
-        <div className="flex flex-col gap-3">
-          {questions.map((question, index) => (
-            <Card key={question.id}>
-              <CardContent className="flex items-start justify-between gap-4 p-4">
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">
-                      {index + 1}.
-                    </span>
-                    <span className="rounded bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
-                      {questionTypeLabels[question.type]}
-                    </span>
+        <>
+          <div className="flex flex-col gap-3">
+            {visibleQuestions.map((question, index) => (
+              <Card key={question.id}>
+                <CardContent className="flex items-start justify-between gap-4 p-4">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {(currentPage - 1) * PAGE_SIZE + index + 1}.
+                      </span>
+                      <span className="rounded bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
+                        {questionTypeLabels[question.type]}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium">{question.text}</p>
+                    <ul className="flex flex-col gap-1">
+                      {question.options.map((option) => (
+                        <li
+                          key={option.id}
+                          className={
+                            option.isCorrect
+                              ? "text-sm text-foreground"
+                              : "text-sm text-muted-foreground"
+                          }
+                        >
+                          {option.isCorrect ? "✓" : "•"} {option.text}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <p className="text-sm font-medium">{question.text}</p>
-                  <ul className="flex flex-col gap-1">
-                    {question.options.map((option) => (
-                      <li
-                        key={option.id}
-                        className={
-                          option.isCorrect
-                            ? "text-sm text-foreground"
-                            : "text-sm text-muted-foreground"
-                        }
-                      >
-                        {option.isCorrect ? "✓" : "•"} {option.text}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="flex shrink-0 gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => openEditQuestion(question)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteQuestion(question)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                  <div className="flex shrink-0 gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openEditQuestion(question)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteQuestion(question)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage <= 1}
+                onClick={() => setPage(currentPage - 1)}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage >= totalPages}
+                onClick={() => setPage(currentPage + 1)}
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        </>
       )}
 
       {attempts.length > 0 && (
