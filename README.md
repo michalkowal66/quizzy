@@ -87,6 +87,12 @@ When no broker is configured (`RabbitMq:Host` unset), the message bus runs
 in-process, so the API and the test suite work without RabbitMQ. Start it with
 `docker compose up -d rabbitmq` only when exercising the asynchronous flow.
 
+In the development environment the database is populated on first run with a
+demo account and sample decks, quizzes and activity, so there is something to
+explore right away. Sign in as `demo@quizzy.local` with password `demo12345`.
+This is controlled by `Seed:SampleData` (enabled in
+`appsettings.Development.json`) and never runs outside Development.
+
 ## Configuration
 
 Configuration is layered: `appsettings.json` holds non-sensitive defaults, environment

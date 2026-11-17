@@ -75,6 +75,12 @@ using (var scope = app.Services.CreateScope())
     var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
     await db.Database.MigrateAsync();
     await DbSeeder.SeedAsync(db, hasher, builder.Configuration);
+
+    if (app.Environment.IsDevelopment()
+        && builder.Configuration.GetValue<bool>("Seed:SampleData"))
+    {
+        await SampleDataSeeder.SeedSampleDataAsync(db, hasher);
+    }
 }
 
 app.Run();
