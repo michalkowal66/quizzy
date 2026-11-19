@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useAuth } from "@/features/auth/use-auth";
 import { getErrorMessage } from "@/lib/problem";
 import { cn } from "@/lib/utils";
@@ -28,6 +30,8 @@ export function AdminUsersPage() {
   const changeRole = useChangeUserRole();
   const deleteUser = useDeleteUser();
 
+  const [pendingDelete, setPendingDelete] = useState<UserSummary | null>(null);
+
   const handleToggleRole = (target: UserSummary) => {
     changeRole.mutate({
       id: target.id,
@@ -35,24 +39,23 @@ export function AdminUsersPage() {
     });
   };
 
-  const handleDelete = (target: UserSummary) => {
-    if (
-      !window.confirm(
-        `Delete ${target.email}? This permanently removes the account along with its decks, quizzes and progress.`,
-      )
-    ) {
+  const openDelete = (target: UserSummary) => {
+    deleteUser.reset();
+    setPendingDelete(target);
+  };
+
+  const confirmDelete = () => {
+    if (!pendingDelete) {
       return;
     }
-    deleteUser.mutate(target.id);
+    deleteUser.mutate(pendingDelete.id, {
+      onSuccess: () => setPendingDelete(null),
+    });
   };
 
   const users = usersQuery.data ?? [];
   const pending = changeRole.isPending || deleteUser.isPending;
-  const actionError = changeRole.isError
-    ? getErrorMessage(changeRole.error)
-    : deleteUser.isError
-      ? getErrorMessage(deleteUser.error)
-      : null;
+  const roleError = changeRole.isError ? getErrorMessage(changeRole.error) : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -63,7 +66,7 @@ export function AdminUsersPage() {
         </p>
       </div>
 
-      {actionError && <p className="text-destructive">{actionError}</p>}
+      {roleError && <p className="text-destructive">{roleError}</p>}
 
       {usersQuery.isPending ? (
         <p className="text-muted-foreground">Loading users…</p>
@@ -115,7 +118,7 @@ export function AdminUsersPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDelete(row)}
+                          onClick={() => openDelete(row)}
                           disabled={isSelf || pending}
                         >
                           Delete
@@ -129,6 +132,26 @@ export function AdminUsersPage() {
           </table>
         </div>
       )}
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingDelete(null);
+          }
+        }}
+        title="Delete user"
+        description={
+          pendingDelete
+            ? `Delete ${pendingDelete.email}? This permanently removes the account along with its decks, quizzes and progress.`
+            : undefined
+        }
+        confirmLabel="Delete"
+        destructive
+        pending={deleteUser.isPending}
+        errorMessage={deleteUser.isError ? getErrorMessage(deleteUser.error) : null}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

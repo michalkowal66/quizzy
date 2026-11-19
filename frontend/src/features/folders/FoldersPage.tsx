@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { getErrorMessage } from "@/lib/problem";
 import { FolderFormDialog, type FolderFormValues } from "./FolderFormDialog";
 import { useDeleteFolder, useFolders, useSaveFolder } from "./hooks";
@@ -14,6 +15,7 @@ export function FoldersPage() {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Folder | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Folder | null>(null);
 
   const openCreate = () => {
     setEditing(null);
@@ -32,15 +34,18 @@ export function FoldersPage() {
     );
   };
 
-  const handleDelete = (folder: Folder) => {
-    if (
-      !window.confirm(
-        "Delete this folder? Its decks and quizzes are kept but moved out of it.",
-      )
-    ) {
+  const openDelete = (folder: Folder) => {
+    deleteFolder.reset();
+    setPendingDelete(folder);
+  };
+
+  const confirmDelete = () => {
+    if (!pendingDelete) {
       return;
     }
-    deleteFolder.mutate(folder.id);
+    deleteFolder.mutate(pendingDelete.id, {
+      onSuccess: () => setPendingDelete(null),
+    });
   };
 
   const folders = foldersQuery.data ?? [];
@@ -90,7 +95,7 @@ export function FoldersPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDelete(folder)}
+                    onClick={() => openDelete(folder)}
                     disabled={deleteFolder.isPending}
                   >
                     Delete
@@ -114,6 +119,24 @@ export function FoldersPage() {
           onSubmit={handleSave}
         />
       )}
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingDelete(null);
+          }
+        }}
+        title="Delete folder"
+        description="Delete this folder? Its decks and quizzes are kept but moved out of it."
+        confirmLabel="Delete"
+        destructive
+        pending={deleteFolder.isPending}
+        errorMessage={
+          deleteFolder.isError ? getErrorMessage(deleteFolder.error) : null
+        }
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

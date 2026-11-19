@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { getErrorMessage } from "@/lib/problem";
 import { useFolders } from "@/features/folders/hooks";
 import { DeckFormDialog, type DeckFormValues } from "./DeckFormDialog";
@@ -37,6 +38,8 @@ export function DeckDetailPage() {
   const [editDeckOpen, setEditDeckOpen] = useState(false);
   const [editingCard, setEditingCard] = useState<Flashcard | null>(null);
   const [cardDialogOpen, setCardDialogOpen] = useState(false);
+  const [deleteDeckOpen, setDeleteDeckOpen] = useState(false);
+  const [pendingCard, setPendingCard] = useState<Flashcard | null>(null);
   const [page, setPage] = useState(1);
 
   const deck = deckQuery.data;
@@ -48,10 +51,12 @@ export function DeckDetailPage() {
     );
   };
 
-  const handleDeleteDeck = () => {
-    if (!window.confirm("Delete this deck and all of its flashcards?")) {
-      return;
-    }
+  const openDeleteDeck = () => {
+    deleteDeck.reset();
+    setDeleteDeckOpen(true);
+  };
+
+  const confirmDeleteDeck = () => {
     deleteDeck.mutate(deckId, { onSuccess: () => navigate("/decks") });
   };
 
@@ -72,10 +77,18 @@ export function DeckDetailPage() {
     );
   };
 
-  const handleDeleteCard = (card: Flashcard) => {
-    if (window.confirm("Delete this flashcard?")) {
-      deleteFlashcard.mutate(card.id);
+  const openDeleteCard = (card: Flashcard) => {
+    deleteFlashcard.reset();
+    setPendingCard(card);
+  };
+
+  const confirmDeleteCard = () => {
+    if (!pendingCard) {
+      return;
     }
+    deleteFlashcard.mutate(pendingCard.id, {
+      onSuccess: () => setPendingCard(null),
+    });
   };
 
   if (deckQuery.isPending) {
@@ -145,7 +158,7 @@ export function DeckDetailPage() {
               variant="ghost"
               size="sm"
               className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-              onClick={handleDeleteDeck}
+              onClick={openDeleteDeck}
               disabled={deleteDeck.isPending}
             >
               Delete
@@ -192,7 +205,7 @@ export function DeckDetailPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDeleteCard(card)}
+                      onClick={() => openDeleteCard(card)}
                     >
                       Delete
                     </Button>
@@ -263,6 +276,40 @@ export function DeckDetailPage() {
           onSubmit={handleSaveCard}
         />
       )}
+
+      <ConfirmDialog
+        open={deleteDeckOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteDeckOpen(false);
+          }
+        }}
+        title="Delete deck"
+        description="Delete this deck and all of its flashcards? This cannot be undone."
+        confirmLabel="Delete"
+        destructive
+        pending={deleteDeck.isPending}
+        errorMessage={deleteDeck.isError ? getErrorMessage(deleteDeck.error) : null}
+        onConfirm={confirmDeleteDeck}
+      />
+
+      <ConfirmDialog
+        open={pendingCard !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingCard(null);
+          }
+        }}
+        title="Delete flashcard"
+        description="Delete this flashcard? This cannot be undone."
+        confirmLabel="Delete"
+        destructive
+        pending={deleteFlashcard.isPending}
+        errorMessage={
+          deleteFlashcard.isError ? getErrorMessage(deleteFlashcard.error) : null
+        }
+        onConfirm={confirmDeleteCard}
+      />
     </div>
   );
 }

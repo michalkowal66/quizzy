@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { getErrorMessage } from "@/lib/problem";
 import { useFolders } from "@/features/folders/hooks";
 import { QuestionFormDialog } from "./QuestionFormDialog";
@@ -49,6 +50,8 @@ export function QuizDetailPage() {
   const [editQuizOpen, setEditQuizOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [questionDialogOpen, setQuestionDialogOpen] = useState(false);
+  const [deleteQuizOpen, setDeleteQuizOpen] = useState(false);
+  const [pendingQuestion, setPendingQuestion] = useState<Question | null>(null);
   const [page, setPage] = useState(1);
 
   const quiz = quizQuery.data;
@@ -60,10 +63,12 @@ export function QuizDetailPage() {
     );
   };
 
-  const handleDeleteQuiz = () => {
-    if (!window.confirm("Delete this quiz and all of its questions?")) {
-      return;
-    }
+  const openDeleteQuiz = () => {
+    deleteQuiz.reset();
+    setDeleteQuizOpen(true);
+  };
+
+  const confirmDeleteQuiz = () => {
     deleteQuiz.mutate(quizId, { onSuccess: () => navigate("/quizzes") });
   };
 
@@ -84,10 +89,18 @@ export function QuizDetailPage() {
     );
   };
 
-  const handleDeleteQuestion = (question: Question) => {
-    if (window.confirm("Delete this question?")) {
-      deleteQuestion.mutate(question.id);
+  const openDeleteQuestion = (question: Question) => {
+    deleteQuestion.reset();
+    setPendingQuestion(question);
+  };
+
+  const confirmDeleteQuestion = () => {
+    if (!pendingQuestion) {
+      return;
     }
+    deleteQuestion.mutate(pendingQuestion.id, {
+      onSuccess: () => setPendingQuestion(null),
+    });
   };
 
   if (quizQuery.isPending) {
@@ -158,7 +171,7 @@ export function QuizDetailPage() {
               variant="ghost"
               size="sm"
               className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-              onClick={handleDeleteQuiz}
+              onClick={openDeleteQuiz}
               disabled={deleteQuiz.isPending}
             >
               Delete
@@ -226,7 +239,7 @@ export function QuizDetailPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDeleteQuestion(question)}
+                      onClick={() => openDeleteQuestion(question)}
                     >
                       Delete
                     </Button>
@@ -329,6 +342,40 @@ export function QuizDetailPage() {
           onSubmit={handleSaveQuestion}
         />
       )}
+
+      <ConfirmDialog
+        open={deleteQuizOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteQuizOpen(false);
+          }
+        }}
+        title="Delete quiz"
+        description="Delete this quiz and all of its questions? This cannot be undone."
+        confirmLabel="Delete"
+        destructive
+        pending={deleteQuiz.isPending}
+        errorMessage={deleteQuiz.isError ? getErrorMessage(deleteQuiz.error) : null}
+        onConfirm={confirmDeleteQuiz}
+      />
+
+      <ConfirmDialog
+        open={pendingQuestion !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingQuestion(null);
+          }
+        }}
+        title="Delete question"
+        description="Delete this question? This cannot be undone."
+        confirmLabel="Delete"
+        destructive
+        pending={deleteQuestion.isPending}
+        errorMessage={
+          deleteQuestion.isError ? getErrorMessage(deleteQuestion.error) : null
+        }
+        onConfirm={confirmDeleteQuestion}
+      />
     </div>
   );
 }
