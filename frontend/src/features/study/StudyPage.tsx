@@ -141,6 +141,7 @@ export function StudyPage() {
         className="w-full rounded-xl text-left [perspective:1000px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         <div
+          key={card.id}
           className={cn(
             "relative min-h-60 transition-transform duration-500 transform-3d motion-reduce:transition-none",
             flipped && "rotate-y-180",

@@ -244,7 +244,7 @@ export function SolvePage() {
         {isLastStep ? (
           <Button
             onClick={handleSubmit}
-            disabled={submitAttempt.isPending || answeredCount === 0}
+            disabled={submitAttempt.isPending}
           >
             {submitAttempt.isPending ? "Submitting…" : "Submit"}
           </Button>
