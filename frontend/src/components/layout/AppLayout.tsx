@@ -4,16 +4,21 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/use-auth";
 import { cn } from "@/lib/utils";
 
-const navItems = [
+const baseNavItems = [
   { to: "/", label: "Dashboard", end: true },
   { to: "/decks", label: "Decks", end: false },
   { to: "/quizzes", label: "Quizzes", end: false },
   { to: "/folders", label: "Folders", end: false },
 ];
 
+const adminNavItem = { to: "/admin/users", label: "Admin", end: false };
+
 export function AppLayout() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+
+  const navItems =
+    user?.role === "Admin" ? [...baseNavItems, adminNavItem] : baseNavItems;
 
   const handleSignOut = () => {
     signOut();

@@ -2,6 +2,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { AppLayout } from "@/components/layout/AppLayout";
+import { AdminUserDetailPage } from "@/features/admin/AdminUserDetailPage";
+import { AdminUsersPage } from "@/features/admin/AdminUsersPage";
 import { AuthProvider } from "@/features/auth/AuthProvider";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RegisterPage } from "@/features/auth/RegisterPage";
@@ -13,6 +15,7 @@ import { QuizDetailPage } from "@/features/quizzes/QuizDetailPage";
 import { QuizzesPage } from "@/features/quizzes/QuizzesPage";
 import { SolvePage } from "@/features/quizzes/SolvePage";
 import { StudyPage } from "@/features/study/StudyPage";
+import { AdminRoute } from "@/routes/AdminRoute";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 
 const queryClient = new QueryClient({
@@ -45,6 +48,13 @@ export default function App() {
                   path="quizzes/:quizId/solve"
                   element={<SolvePage />}
                 />
+                <Route element={<AdminRoute />}>
+                  <Route path="admin/users" element={<AdminUsersPage />} />
+                  <Route
+                    path="admin/users/:userId"
+                    element={<AdminUserDetailPage />}
+                  />
+                </Route>
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

@@ -167,14 +167,85 @@ public class ApiIntegrationTests : IClassFixture<QuizzyApiFactory>
         var asUser = await user.GetAsync("/admin/users");
         Assert.Equal(HttpStatusCode.Forbidden, asUser.StatusCode);
 
-        var admin = _factory.CreateClient();
-        var login = await admin.PostAsJsonAsync("/auth/login",
-            new { email = "admin@quizzy.local", password = "Admin123!" });
-        var auth = await login.Content.ReadFromJsonAsync<AuthResponse>();
-        admin.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", auth!.Token);
-
+        var (admin, _) = await CreateAdminClientAsync();
         var asAdmin = await admin.GetAsync("/admin/users");
         Assert.Equal(HttpStatusCode.OK, asAdmin.StatusCode);
+    }
+
+    [Fact]
+    public async Task Admin_ManagingUsers_IsForbiddenForNonAdmins()
+    {
+        var user = _factory.CreateClient();
+        var auth = await RegisterAsync(user);
+
+        // The role gate rejects the request before the handler, even on the caller's own account.
+        var delete = await user.DeleteAsync($"/admin/users/{auth.UserId}");
+        Assert.Equal(HttpStatusCode.Forbidden, delete.StatusCode);
+
+        var changeRole = await user.PutAsJsonAsync($"/admin/users/{auth.UserId}/role", new { role = "Admin" });
+        Assert.Equal(HttpStatusCode.Forbidden, changeRole.StatusCode);
+    }
+
+    [Fact]
+    public async Task Admin_CanReadUserDetailWithStats()
+    {
+        var (admin, _) = await CreateAdminClientAsync();
+        var target = await RegisterAsync(_factory.CreateClient());
+
+        var detail = await admin.GetFromJsonAsync<UserDetailResponse>($"/admin/users/{target.UserId}");
+
+        Assert.NotNull(detail);
+        Assert.Equal(target.Email, detail!.Email);
+        Assert.Equal("User", detail.Role);
+        Assert.Equal(0, detail.DeckCount);
+        Assert.Equal(0, detail.QuizCount);
+        Assert.Equal(0, detail.CurrentStreak);
+    }
+
+    [Fact]
+    public async Task Admin_CanChangeUserRole()
+    {
+        var (admin, _) = await CreateAdminClientAsync();
+        var target = await RegisterAsync(_factory.CreateClient());
+
+        var response = await admin.PutAsJsonAsync($"/admin/users/{target.UserId}/role", new { role = "Admin" });
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var summary = await response.Content.ReadFromJsonAsync<UserSummaryResponse>();
+        Assert.Equal("Admin", summary!.Role);
+    }
+
+    [Fact]
+    public async Task Admin_CannotChangeOwnRole()
+    {
+        var (admin, auth) = await CreateAdminClientAsync();
+
+        var response = await admin.PutAsJsonAsync($"/admin/users/{auth.UserId}/role", new { role = "User" });
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Admin_CanDeleteUser()
+    {
+        var (admin, _) = await CreateAdminClientAsync();
+        var target = await RegisterAsync(_factory.CreateClient());
+
+        var delete = await admin.DeleteAsync($"/admin/users/{target.UserId}");
+        Assert.Equal(HttpStatusCode.NoContent, delete.StatusCode);
+
+        var afterGet = await admin.GetAsync($"/admin/users/{target.UserId}");
+        Assert.Equal(HttpStatusCode.NotFound, afterGet.StatusCode);
+    }
+
+    [Fact]
+    public async Task Admin_CannotDeleteOwnAccount()
+    {
+        var (admin, auth) = await CreateAdminClientAsync();
+
+        var delete = await admin.DeleteAsync($"/admin/users/{auth.UserId}");
+
+        Assert.Equal(HttpStatusCode.Conflict, delete.StatusCode);
     }
 
     [Fact]
@@ -284,7 +355,9 @@ public class ApiIntegrationTests : IClassFixture<QuizzyApiFactory>
         return false;
     }
 
-    private async Task AuthenticateAsync(HttpClient client)
+    private async Task AuthenticateAsync(HttpClient client) => await RegisterAsync(client);
+
+    private async Task<AuthResponse> RegisterAsync(HttpClient client)
     {
         var email = $"user_{Guid.NewGuid():N}@test.local";
         var response = await client.PostAsJsonAsync("/auth/register",
@@ -292,6 +365,17 @@ public class ApiIntegrationTests : IClassFixture<QuizzyApiFactory>
         response.EnsureSuccessStatusCode();
         var auth = await response.Content.ReadFromJsonAsync<AuthResponse>();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", auth!.Token);
+        return auth;
+    }
+
+    private async Task<(HttpClient Client, AuthResponse Auth)> CreateAdminClientAsync()
+    {
+        var admin = _factory.CreateClient();
+        var login = await admin.PostAsJsonAsync("/auth/login",
+            new { email = "admin@quizzy.local", password = "Admin123!" });
+        var auth = await login.Content.ReadFromJsonAsync<AuthResponse>();
+        admin.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", auth!.Token);
+        return (admin, auth);
     }
 
     private record AuthResponse(string Token, Guid UserId, string Email, string DisplayName, string Role);
@@ -309,4 +393,20 @@ public class ApiIntegrationTests : IClassFixture<QuizzyApiFactory>
     private record PagedResponse<T>(List<T> Items, int Page, int PageSize, int TotalCount, int TotalPages);
 
     private record DashboardResponse(int CurrentStreak, int LongestStreak, bool StudiedToday);
+
+    private record UserSummaryResponse(Guid Id, string Email, string DisplayName, string Role, DateTime CreatedAt);
+
+    private record UserDetailResponse(
+        Guid Id,
+        string Email,
+        string DisplayName,
+        string Role,
+        DateTime CreatedAt,
+        int CurrentStreak,
+        int LongestStreak,
+        DateOnly? LastActivity,
+        int DeckCount,
+        int FlashcardCount,
+        int QuizCount,
+        int AttemptCount);
 }
