@@ -16,7 +16,8 @@ public class FolderConfiguration : IEntityTypeConfiguration<Folder>
             .HasMaxLength(100)
             .IsRequired();
 
-        builder.HasIndex(f => new { f.OwnerId, f.Name });
+        builder.HasIndex(f => new { f.OwnerId, f.Name })
+            .IsUnique();
 
         builder.HasMany(f => f.Decks)
             .WithOne(d => d.Folder)

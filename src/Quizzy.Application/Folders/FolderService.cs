@@ -48,7 +48,7 @@ public class FolderService : IFolderService
         };
 
         _db.Folders.Add(folder);
-        await _db.SaveChangesAsync(cancellationToken);
+        await SaveTranslatingNameConflictAsync(folder.Name, excludedId: null, cancellationToken);
 
         return new FolderDto(folder.Id, folder.Name, 0, 0, folder.CreatedAt);
     }
@@ -59,7 +59,7 @@ public class FolderService : IFolderService
         await EnsureNameIsUniqueAsync(name, excludedId: id, cancellationToken);
 
         folder.Name = name.Trim();
-        await _db.SaveChangesAsync(cancellationToken);
+        await SaveTranslatingNameConflictAsync(folder.Name, excludedId: id, cancellationToken);
 
         var quizCount = await _db.Quizzes.CountAsync(q => q.FolderId == folder.Id, cancellationToken);
         return new FolderDto(folder.Id, folder.Name, folder.Decks.Count, quizCount, folder.CreatedAt);
@@ -70,6 +70,19 @@ public class FolderService : IFolderService
         var folder = await FindOwnedAsync(id, cancellationToken);
         _db.Folders.Remove(folder);
         await _db.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task SaveTranslatingNameConflictAsync(string name, Guid? excludedId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            await EnsureNameIsUniqueAsync(name, excludedId, cancellationToken);
+            throw;
+        }
     }
 
     private async Task<Folder> FindOwnedAsync(Guid id, CancellationToken cancellationToken)

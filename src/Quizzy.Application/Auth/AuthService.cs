@@ -41,7 +41,20 @@ public class AuthService : IAuthService
         };
 
         _db.Users.Add(user);
-        await _db.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            if (await _db.Users.AnyAsync(u => u.Email == email, cancellationToken))
+            {
+                throw new ConflictException($"An account with email '{email}' already exists.");
+            }
+
+            throw;
+        }
 
         return CreateResult(user);
     }

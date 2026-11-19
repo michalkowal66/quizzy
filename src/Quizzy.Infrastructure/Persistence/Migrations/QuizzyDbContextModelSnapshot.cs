@@ -163,7 +163,8 @@ namespace Quizzy.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerId", "Name");
+                    b.HasIndex("OwnerId", "Name")
+                        .IsUnique();
 
                     b.ToTable("folders", (string)null);
                 });
