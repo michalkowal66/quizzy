@@ -93,6 +93,10 @@ explore right away. Sign in as `demo@quizzy.local` with password `demo12345`.
 This is controlled by `Seed:SampleData` (enabled in
 `appsettings.Development.json`) and never runs outside Development.
 
+An administrator account (`admin@quizzy.local` / `admin12345`) is also seeded in
+development from `Seed:AdminEmail` and `Seed:AdminPassword`. Outside Development
+set both values yourself (for example in `.env` for the Docker stack).
+
 ## Configuration
 
 Configuration is layered: `appsettings.json` holds non-sensitive defaults, environment
